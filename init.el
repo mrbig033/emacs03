@@ -130,6 +130,7 @@
 
   :bind (:map evil-normal-state-map
               ("z=" . endless/ispell-word-then-abbrev)
+              ("ç" . insert-char)
               ;; ("=" . evil-indent)
               ;; ("C--" . kill-whole-line)
               ("gh" . org-up-element)
@@ -195,6 +196,7 @@
               ("C-a"                 . evil-numbers/inc-at-pt))
 
   :bind (:map evil-visual-state-map
+              ("ç" . insert-char)
               ("K"                 . ignore)
               ("g3"                . evil-backward-word-end)
               ("ge"                . end-of-visual-line)
@@ -424,6 +426,9 @@
 
   (general-define-key
    :keymaps  'global
+   "M-3" 'counsel-projectile-switch-to-buffer
+   "M-1" 'eyebrowse-prev-window-config
+   "M-2" 'eyebrowse-next-window-config
    "M-7" 'make-frame
    "M-8" 'other-frame
    "M-9"     'delete-other-windows
@@ -446,15 +451,14 @@
    "C-c s" 'my-shell-full
    "C-c v"   'yank
    "C-x r" 'kill-ring-save
+   "C-x c" 'quick-calc
+   "C-c i" 'pbcopy
    "§" 'helm-resume
    "C-s" 'helm-swoop-without-pre-input
    "C-c u" 'revert-buffer
    "M-'"    'delete-window
    "M-r" 'ivy-switch-buffer
    "M-t" 'counsel-projectile-switch-to-buffer
-   "M-3" 'counsel-projectile-switch-to-buffer
-   "M-1" 'eyebrowse-prev-window-config
-   "M-2" 'eyebrowse-next-window-config
    "M-s" 'last-buffer
    "C-x s" 'my-shell-below
    "M-ç" 'insert-char
@@ -1033,13 +1037,22 @@
 
 (use-package org-pomodoro
   :after org
+  :init
+  (add-hook 'org-pomodoro-finished-hook 'org-clock-goto)
+  (add-hook 'org-pomodoro-long-break-finished-hook 'org-clock-goto)
+  (add-hook 'org-pomodoro-short-break-finished-hook 'org-clock-goto)
   :config
-  (setq org-pomodoro-length 25
-        org-pomodoro-long-break-length 20
-        org-pomodoro-short-break-length 5
-        org-pomodoro-ask-upon-killing nil
+  (setq org-pomodoro-length 15 ;; 25 x 0.6
+        org-pomodoro-long-break-length 12. ;; 20 * 0.6
+        org-pomodoro-short-break-length 3 ;; 5 * 0.6
+        org-pomodoro-ask-upon-killing t
+        org-pomodoro-keep-killed-pomodoro-time t
         org-pomodoro-time-format "%.2m"
+        org-pomodoro-short-break-format "SHORT: %s"
+        org-pomodoro-long-break-format "LONG: %s"
         org-pomodoro-format "P: %s"))
+
+(use-package yequake)
 
 (use-package w3m
   :defer t)
@@ -1134,7 +1147,11 @@
         unkillable-buffers '("^\\*scratch\\*$"
                              "^init.org$"
                              "^agenda.org$"
-                             "*Racket REPL*"))
+                             "^bashtasks.org$"
+                             "^bashnotes.org$"
+                             "*Racket REPL*"
+
+                             ))
 
   ;; http://bit.ly/332kLj9
   (defun my-create-scratch-buffer nil
@@ -4585,6 +4602,7 @@ with the scratch buffer."
         flycheck-idle-change-delay 0.5
         flycheck-clang-pedantic t
         flycheck-gcc-pedantic t
+        flycheck-python-mypy-executable "~/.pyenv/shims/mypy"
         flycheck-check-syntax-automatically '(idle-change mode-enabled)
         flycheck-sh-shellcheck-executable "/usr/local/bin/shellcheck"))
 
@@ -5379,18 +5397,19 @@ with the scratch buffer."
   (sml/setup))
 
 (use-package doom-themes
-  ;; :disabled
+  :disabled
   :config
   (doom-themes-org-config)
   ;; (load-theme 'doom-dracula t)
-  (load-theme 'doom-gruvbox t))
+  ;; (load-theme 'doom-gruvbox t)
+  )
 
-(use-package poet-theme
-  ;; :disabled
-  :defer t)
+(use-package poet-theme)
 
 (use-package dracula-theme
-  :disabled)
+  :config
+  (setq dracula-enlarge-headings nil)
+  (load-theme 'dracula t))
 
 (defun text-scale-reset ()
   (interactive)
@@ -6133,7 +6152,8 @@ with the scratch buffer."
     "C-p" 'comint-previous-input
     "C-n" 'comint-next-input
     "C-c u" 'universal-argument
-    "C-M-l" 'comint-clear-buffer
+    "C-l" 'comint-clear-buffer
+    "C-M-l" 'recenter-top-bottom
     ;; "M-u" 'my-shell-go-up
     "M-u" 'yas-expand
     "M-i" 'my-shell-go-back
@@ -6144,7 +6164,8 @@ with the scratch buffer."
   (nvmap
     :keymaps 'shell-mode-map
     "C-c u" 'universal-argument
-    "C-M-l" 'comint-clear-buffer
+    "C-l" 'comint-clear-buffer
+    "C-M-l" 'recenter-top-bottom
     "M-u" 'my-shell-go-up
     "M-i" 'my-shell-go-back
     "M-p" 'my-shell-go-previous
@@ -6159,7 +6180,8 @@ with the scratch buffer."
    "C-c 0" 'my-jump-to-register-91
    "C-r" 'counsel-shell-history
    "C-n" 'comint-next-input
-   "C-M-l" 'comint-clear-buffer
+   "C-l" 'comint-clear-buffer
+   "C-M-l" 'recenter-top-bottom
    "C-c u" 'universal-argument
    "M-p" 'my-shell-go-previous
    "C-p" 'comint-previous-input
@@ -8201,6 +8223,21 @@ Emacs session."
   (interactive)
   (let ((inhibit-message t))
     (ranger-find-file udir)))
+
+(defun pbcopy ()
+  (interactive)
+  (let ((deactivate-mark t))
+    (call-process-region (point) (mark) "pbcopy"))
+  (evil-exit-visual-state))
+
+(defun pbpaste ()
+  (interactive)
+  (call-process-region (point) (if mark-active (mark) (point)) "pbpaste" t t))
+
+(defun pbcut ()
+  (interactive)
+  (pbcopy)
+  (delete-region (region-beginning) (region-end)))
 
 (fset 'my-reload-theme-macro
    [?  ?c ?L return ?  ?c ?l return])

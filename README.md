@@ -1,2 +1,1 @@
-# emacs02
-# emacs03
+# Emacs on my Macbook Air

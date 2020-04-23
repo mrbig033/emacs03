@@ -477,6 +477,7 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
 
   :bind (:map evil-normal-state-map
               ("z=" . endless/ispell-word-then-abbrev)
+              ("ç" . insert-char)
               ;; ("=" . evil-indent)
               ;; ("C--" . kill-whole-line)
               ("gh" . org-up-element)
@@ -542,6 +543,7 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
               ("C-a"                 . evil-numbers/inc-at-pt))
 
   :bind (:map evil-visual-state-map
+              ("ç" . insert-char)
               ("K"                 . ignore)
               ("g3"                . evil-backward-word-end)
               ("ge"                . end-of-visual-line)
@@ -792,6 +794,9 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
 
   (general-define-key
    :keymaps  'global
+   "M-3" 'counsel-projectile-switch-to-buffer
+   "M-1" 'eyebrowse-prev-window-config
+   "M-2" 'eyebrowse-next-window-config
    "M-7" 'make-frame
    "M-8" 'other-frame
    "M-9"     'delete-other-windows
@@ -814,15 +819,14 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
    "C-c s" 'my-shell-full
    "C-c v"   'yank
    "C-x r" 'kill-ring-save
+   "C-x c" 'quick-calc
+   "C-c i" 'pbcopy
    "§" 'helm-resume
    "C-s" 'helm-swoop-without-pre-input
    "C-c u" 'revert-buffer
    "M-'"    'delete-window
    "M-r" 'ivy-switch-buffer
    "M-t" 'counsel-projectile-switch-to-buffer
-   "M-3" 'counsel-projectile-switch-to-buffer
-   "M-1" 'eyebrowse-prev-window-config
-   "M-2" 'eyebrowse-next-window-config
    "M-s" 'last-buffer
    "C-x s" 'my-shell-below
    "M-ç" 'insert-char
@@ -1428,15 +1432,26 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
 #+BEGIN_SRC emacs-lisp
 (use-package org-pomodoro
   :after org
+  :init
+  (add-hook 'org-pomodoro-finished-hook 'org-clock-goto)
+  (add-hook 'org-pomodoro-long-break-finished-hook 'org-clock-goto)
+  (add-hook 'org-pomodoro-short-break-finished-hook 'org-clock-goto)
   :config
-  (setq org-pomodoro-length 25
-        org-pomodoro-long-break-length 20
-        org-pomodoro-short-break-length 5
-        org-pomodoro-ask-upon-killing nil
+  (setq org-pomodoro-length 15 ;; 25 x 0.6
+        org-pomodoro-long-break-length 12. ;; 20 * 0.6
+        org-pomodoro-short-break-length 3 ;; 5 * 0.6
+        org-pomodoro-ask-upon-killing t
+        org-pomodoro-keep-killed-pomodoro-time t
         org-pomodoro-time-format "%.2m"
+        org-pomodoro-short-break-format "SHORT: %s"
+        org-pomodoro-long-break-format "LONG: %s"
         org-pomodoro-format "P: %s"))
 #+END_SRC
 * Utils
+** yequake
+#+BEGIN_SRC emacs-lisp
+(use-package yequake)
+#+END_SRC
 ** w3m
 #+BEGIN_SRC emacs-lisp
 (use-package w3m
@@ -1552,7 +1567,11 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
         unkillable-buffers '("^\\*scratch\\*$"
                              "^init.org$"
                              "^agenda.org$"
-                             "*Racket REPL*"))
+                             "^bashtasks.org$"
+                             "^bashnotes.org$"
+                             "*Racket REPL*"
+
+                             ))
 
   ;; http://bit.ly/332kLj9
   (defun my-create-scratch-buffer nil
@@ -5297,6 +5316,7 @@ If you run ~racket-mode-start-faster~ this command, ever, you should run it agai
         flycheck-idle-change-delay 0.5
         flycheck-clang-pedantic t
         flycheck-gcc-pedantic t
+        flycheck-python-mypy-executable "~/.pyenv/shims/mypy"
         flycheck-check-syntax-automatically '(idle-change mode-enabled)
         flycheck-sh-shellcheck-executable "/usr/local/bin/shellcheck"))
 #+END_SRC
@@ -6000,6 +6020,7 @@ Just use your normal `write-file` and supply the file name of your choice. Be aw
 (use-package importmagic
   :after python
   :config
+  (setq importmagic-python-interpreter "~/.pyenv/shims/python")
   (setq importmagic-be-quiet t)
   (remove-hook 'python-mode-hook 'importmagic-mode))
 #+END_SRC
@@ -6199,22 +6220,23 @@ Just use your normal `write-file` and supply the file name of your choice. Be aw
 *** doom themes
 #+BEGIN_SRC emacs-lisp
 (use-package doom-themes
-  ;; :disabled
+  :disabled
   :config
   (doom-themes-org-config)
   ;; (load-theme 'doom-dracula t)
-  (load-theme 'doom-gruvbox t))
+  ;; (load-theme 'doom-gruvbox t)
+  )
  #+END_SRC
 *** poet
 #+BEGIN_SRC emacs-lisp
-(use-package poet-theme
-  ;; :disabled
-  :defer t)
+(use-package poet-theme)
 #+END_SRC
 *** dracula
 #+BEGIN_SRC emacs-lisp
 (use-package dracula-theme
-  :disabled)
+  :config
+  (setq dracula-enlarge-headings nil)
+  (load-theme 'dracula t))
 #+END_SRC
 ** windows
 *** reset text scale
@@ -7014,7 +7036,8 @@ Just use your normal `write-file` and supply the file name of your choice. Be aw
     "C-p" 'comint-previous-input
     "C-n" 'comint-next-input
     "C-c u" 'universal-argument
-    "C-M-l" 'comint-clear-buffer
+    "C-l" 'comint-clear-buffer
+    "C-M-l" 'recenter-top-bottom
     ;; "M-u" 'my-shell-go-up
     "M-u" 'yas-expand
     "M-i" 'my-shell-go-back
@@ -7025,7 +7048,8 @@ Just use your normal `write-file` and supply the file name of your choice. Be aw
   (nvmap
     :keymaps 'shell-mode-map
     "C-c u" 'universal-argument
-    "C-M-l" 'comint-clear-buffer
+    "C-l" 'comint-clear-buffer
+    "C-M-l" 'recenter-top-bottom
     "M-u" 'my-shell-go-up
     "M-i" 'my-shell-go-back
     "M-p" 'my-shell-go-previous
@@ -7040,7 +7064,8 @@ Just use your normal `write-file` and supply the file name of your choice. Be aw
    "C-c 0" 'my-jump-to-register-91
    "C-r" 'counsel-shell-history
    "C-n" 'comint-next-input
-   "C-M-l" 'comint-clear-buffer
+   "C-l" 'comint-clear-buffer
+   "C-M-l" 'recenter-top-bottom
    "C-c u" 'universal-argument
    "M-p" 'my-shell-go-previous
    "C-p" 'comint-previous-input
@@ -9221,7 +9246,24 @@ Emacs session."
   (let ((inhibit-message t))
     (ranger-find-file udir)))
 #+END_SRC
+*** Copy and Past
+Source: https://emacs.stackexchange.com/a/20426
+#+BEGIN_SRC emacs-lisp
+(defun pbcopy ()
+  (interactive)
+  (let ((deactivate-mark t))
+    (call-process-region (point) (mark) "pbcopy"))
+  (evil-exit-visual-state))
 
+(defun pbpaste ()
+  (interactive)
+  (call-process-region (point) (if mark-active (mark) (point)) "pbpaste" t t))
+
+(defun pbcut ()
+  (interactive)
+  (pbcopy)
+  (delete-region (region-beginning) (region-end)))
+#+END_SRC
 ** Macros
 #+BEGIN_SRC emacs-lisp
 (fset 'my-reload-theme-macro
