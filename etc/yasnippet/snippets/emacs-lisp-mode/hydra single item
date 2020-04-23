@@ -1,0 +1,5 @@
+# key: h
+# name: hydra single item
+# --
+_${1:key}_: ${2:command}
+$0

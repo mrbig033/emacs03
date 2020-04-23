@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: my margin
+# key: mm
+# --
+margin: $0;

@@ -1,0 +1,4 @@
+# key: vdic
+# name: variable with dict
+# --
+${1:variable} = dict(${2:key}=${3:value}$0)

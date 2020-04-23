@@ -1,0 +1,6 @@
+# key: n
+# name: note
+# binding: [3 111]
+# expand-env: ((yas-after-expand-snippet-hook 'evil-insert-state))
+# --
+[[$1]]$0

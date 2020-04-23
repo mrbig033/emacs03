@@ -1,0 +1,5 @@
+# key: sa
+# name: self with atribute
+# expand-env: ((yas-after-exit-snippet-hook 'newline-and-indent))  
+# --
+self.${1:atribute} = $1$0

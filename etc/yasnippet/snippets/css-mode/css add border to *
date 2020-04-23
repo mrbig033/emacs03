@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: css add border to *
+# key: *
+# --
+* {
+    border: 1px solid red;
+}

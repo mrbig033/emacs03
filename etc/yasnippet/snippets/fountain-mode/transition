@@ -1,0 +1,4 @@
+# key: t
+# name: transition
+# --
+> ${1:$$(upcase yas-text)}:

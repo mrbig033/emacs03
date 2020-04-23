@@ -1,0 +1,2 @@
+;;; -*- no-byte-compile: t -*-
+(define-package "nswbuff" "20200312.2050" "Quick switching between buffers." '((emacs "25.1")) :commit "a601855cc96e303e38051d0d1af3402721dbb969" :keywords '("extensions" "convenience") :authors '(("David Ponce" . "david@dponce.com") ("Kahlil (Kal) HODGSON" . "dorge@tpg.com.au") ("Joost Kremers" . "joostkremers@fastmail.fm")) :maintainer '("Joost Kremers" . "joostkremers@fastmail.fm") :url "https://github.com/joostkremers/nswbuff")

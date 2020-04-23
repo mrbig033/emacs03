@@ -1,0 +1,9 @@
+# key: wd
+# name: will dog src block
+# --
+\#+BEGIN_SRC shell
+$will@peggy:$ dog $1
+
+$0
+
+\#+END_SRC

@@ -1,0 +1,4 @@
+# key: tup
+# name: simple tuple
+# --
+${1:variable} = ("${2:Value1}", "${3:Value2}"$0)

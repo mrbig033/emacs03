@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: list item with description
+# key: it
+# --
+- $1 :: $0

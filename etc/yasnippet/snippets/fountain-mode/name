@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: name
+# key: na
+# --
+${1:CHARACTER}
+$0

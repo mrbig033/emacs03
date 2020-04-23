@@ -1,0 +1,4 @@
+# key: c
+# name: code with space
+# --
+~$1~ $0

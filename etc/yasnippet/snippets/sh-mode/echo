@@ -1,0 +1,4 @@
+# key: e.
+# name: echo
+# --
+echo '$0'

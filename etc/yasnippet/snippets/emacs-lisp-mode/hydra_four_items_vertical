@@ -1,0 +1,7 @@
+# key: hy
+# name: hydra four items vertical
+# --
+_${1:key}_: ${2:command}
+_${3:key}_: ${4:command}
+_${5:key}_: ${6:command}
+_${7:key}_: ${8:command}

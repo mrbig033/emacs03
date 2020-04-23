@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: org.css stylel local
+# key: stylel
+# --
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="~/.emacs.d/etc/org.css"/>

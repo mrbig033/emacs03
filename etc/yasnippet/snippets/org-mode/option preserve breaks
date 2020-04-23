@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: option preserve breaks
+# key: breaks
+# --
+#+OPTIONS: \\n:t

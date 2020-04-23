@@ -1,0 +1,4 @@
+# key: i
+# name: org italic
+# --
+/$1/ $0

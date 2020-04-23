@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: lang
+# key: lan
+# --
+#lang $1
+
+$0

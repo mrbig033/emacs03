@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: pov - ponto de vista
+# key: pov
+# --
+.POV D$1

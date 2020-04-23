@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: print mro
+# key: mro
+# --
+print($0.mro())

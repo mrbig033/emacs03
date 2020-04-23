@@ -1,0 +1,4 @@
+# key: sh
+# name: python 3 shebang
+# --
+#!/usr/bin/env python3

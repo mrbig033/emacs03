@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: my add hook
+# key: ahh
+# --
+(add-hook '`(yank)` '$0)

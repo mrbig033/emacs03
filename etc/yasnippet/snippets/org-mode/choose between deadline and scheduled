@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: choose between deadline and scheduled
+# key: choose-type
+# --
+${1:$$(yas-choose-value '("DEADLINE:" "SCHEDULED:"))}"

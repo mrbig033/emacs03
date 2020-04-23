@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: title
+# key: ti
+# --
+Title: ${1:$$(upcase yas-text)}
+Author: ${2:Author}
+Draft date: ${3:Primeiro} Tratamento
+Copyright: © Bahia com H
+Contact: $4@$5
+
+$0

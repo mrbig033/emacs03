@@ -1,0 +1,4 @@
+# key: a
+# name: arithmetic expansion
+# --
+(( $1 ))$0

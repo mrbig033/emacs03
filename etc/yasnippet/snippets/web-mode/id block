@@ -1,0 +1,6 @@
+# key: #
+# name: id block
+# --
+#${1:id} {
+    $0
+}

@@ -1,0 +1,8 @@
+# key: sys
+# name: python make system and output nicer
+# --
+import os
+import sys
+
+os.system("clear")
+sys.tracebacklimit = 0

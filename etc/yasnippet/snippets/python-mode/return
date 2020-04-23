@@ -1,0 +1,6 @@
+# key: r
+# name: return
+# binding: C-x u
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil) (yas-after-exit-snippet-hook 'evil-insert-state))
+# --
+return $0

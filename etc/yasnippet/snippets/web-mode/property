@@ -1,0 +1,5 @@
+# key: prp
+# name: property
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil)) 
+# --
+${1:property}: $0;

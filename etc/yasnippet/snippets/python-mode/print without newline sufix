@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: print without newline sufix
+# key: end
+# --
+end=""$0

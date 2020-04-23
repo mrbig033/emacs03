@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: bash aliases src block
+# key: al
+# --
+#+BEGIN_SRC sh :tangle .bash_aliases
+$0
+#+END_SRC

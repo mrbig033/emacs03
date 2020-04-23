@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: ref1
+# key: 1
+# binding: C-c 1
+# --
+<sup>[1]</sup> $0

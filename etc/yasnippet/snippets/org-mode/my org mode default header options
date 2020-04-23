@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: my org mode default header options
+# key: options
+# --
+#+OPTIONS: toc:nil, num:nil, date:nil, html-postamble:nil, \\n:t

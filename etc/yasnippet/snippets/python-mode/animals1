@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: animals one
+# key: ani1
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil)) 
+# --
+animals = [
+    "capybara",
+    "iguana",
+    "bat",
+    "baboon",
+    "sheep",
+    "reindeer",
+    "mouse",
+    "okapi",
+    "parrot",
+    "pony",
+]

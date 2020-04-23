@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: end src block
+# key: end
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil)) 
+# --
+#+END_SRC

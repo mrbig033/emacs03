@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: org export latext no page numbers
+# key: nonumbers
+# --
+\#+LATEX_HEADER: \usepackage{nopageno}

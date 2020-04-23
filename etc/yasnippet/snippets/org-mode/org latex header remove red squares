@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: org latex header remove red squares
+# key: latex-no-red
+# --
+#+LATEX_HEADER: \hypersetup{colorlinks=true}

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: general define key
+# key: define
+# --
+(general-define-key
+  :keymaps  '${1:mode-map}
+  :states '(${2:normal visual insert})
+  "${3:keybindings}"     '${4:command})

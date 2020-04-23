@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: forced scene heading
+# key: f
+# --
+.$1

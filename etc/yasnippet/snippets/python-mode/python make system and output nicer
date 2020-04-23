@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: python make system and output nicer
+# key: sys
+# --
+import os
+import sys
+
+os.system("clear")
+sys.tracebacklimit = 0

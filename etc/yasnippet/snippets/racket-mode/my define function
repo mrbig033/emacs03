@@ -1,0 +1,5 @@
+# key: defs
+# name: my define function
+# --
+(define ($1)
+  ($0))

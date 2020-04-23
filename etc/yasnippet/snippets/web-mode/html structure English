@@ -1,0 +1,17 @@
+# key: 11
+# name: html initial structure
+# --
+<!DOCTYPE HTML>
+<html lang="${1:$$(yas-choose-value '("pt-br" "en"))}">
+
+    <head>
+        <meta charset="UTF-8" />
+        <link href="style.css" rel="stylesheet"/>
+        <title>$2</title>
+    </head>
+
+    <body>
+        $0
+    </body>
+
+</html>

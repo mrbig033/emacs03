@@ -1,0 +1,4 @@
+# key: dic
+# name: dictionary simple
+# --
+{${2:key1}:${3:value1}$0}

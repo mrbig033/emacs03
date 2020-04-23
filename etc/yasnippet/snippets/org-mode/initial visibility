@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: initial visibility
+# key: initial
+# --
+#+STARTUP: ${1:$$(yas-choose-value '("overview" "content" "showall" "showeverything"))}

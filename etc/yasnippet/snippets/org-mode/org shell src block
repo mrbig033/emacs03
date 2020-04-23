@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: org shell src block
+# key: shell
+# --
+#+BEGIN_SRC shell
+$0
+#+END_SRC

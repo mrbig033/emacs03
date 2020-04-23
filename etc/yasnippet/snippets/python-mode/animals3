@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: animals three
+# key: ani3
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil)) 
+# --
+animals = [
+    "rhinoceros",
+    "bull",
+    "horse",
+    "yak",
+    "hog",
+    "koala",
+    "bighorn",
+    "ocelot",
+    "alligator",
+    "crocodile",
+]

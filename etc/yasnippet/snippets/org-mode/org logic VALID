@@ -1,0 +1,5 @@
+# key: val
+# name: org logic VALID
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil) (yas-after-exit-snippet-hook 'evil-normal-state)) 
+# --
+*VALID*.$0

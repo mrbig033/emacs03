@@ -1,0 +1,7 @@
+# key: classy
+# name: class with init method
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil) (yas-after-exit-snippet-hook 'blacken-buffer))
+# --
+class ${1:ClassName}:
+    def __init__(self$2):
+        ${0:pass}

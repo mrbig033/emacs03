@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: dictionary comphreension simple
+# key: dicc
+# --
+${1:dic} = \{${2:list1}[i]: ${3:list2}[i] for ${4:i} in ${5:range($0)}\}

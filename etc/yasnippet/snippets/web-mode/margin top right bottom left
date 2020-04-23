@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: margin top right bottom left
+# key: mh
+# --
+margin: ${top} ${right} ${bottom} ${left};

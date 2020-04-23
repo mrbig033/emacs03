@@ -1,0 +1,8 @@
+# key: usep
+# name: use package
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil)) 
+# --
+#+BEGIN_SRC emacs-lisp
+(use-package $1
+  :defer t$0)
+#+END_SRC

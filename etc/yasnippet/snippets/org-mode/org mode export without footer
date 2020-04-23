@@ -1,0 +1,4 @@
+# key: nofooter
+# name: org mode export without footer
+# --
+#+OPTIONS: html-postamble:nil

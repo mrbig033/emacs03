@@ -1,0 +1,6 @@
+# key: defs
+# name: simple function, no parameters
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+def ${1:name}():
+    $0

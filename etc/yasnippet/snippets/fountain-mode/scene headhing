@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: scene heading
+# key: s
+# binding: C-c s
+# --
+${1:$$(yas-choose-value '("INT" "EXT"))}. ${2:$$(upcase yas-text)} - ${3:$$(yas-choose-value '("DIA" "NOITE" "DAY" "NIGHT"))}
+
+$0

@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: entry
+# key: entry_
+# --
+#+BEGIN_HTML
+---
+layout: ${1:default}
+title: ${2:title}
+---
+#+END_HTML

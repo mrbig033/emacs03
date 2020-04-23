@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# key: ref
+# name: ref
+# binding: C-c r
+# expand-env: ((yas-before-expand-snippet-hook 'evil-insert-state))
+# --
+<sup>[$1]</sup> $0

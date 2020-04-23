@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: test with echo
+# key: te
+# --
+[[ $1 ]] && echo '$2'$0

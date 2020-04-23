@@ -1,0 +1,12 @@
+# key: d
+# name: will dog src block
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil)) 
+# --
+#+BEGIN_SRC shell
+$will@peggy:$ dog ${1:command}
+
+Dog ${2:response}.
+
+#+END_SRC
+
+$0

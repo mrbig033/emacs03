@@ -1,0 +1,5 @@
+# key: col
+# name: org collumn view propert
+# source: https://orgmode.org/manual/Effort-estimates.html
+# --
+#+COLUMNS: %40ITEM(Task) %17Effort(Effort){:} %CLOCKSUM(Clocked)

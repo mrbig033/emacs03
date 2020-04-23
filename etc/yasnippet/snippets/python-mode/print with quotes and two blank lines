@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: print with quotes and two blank lines
+# key: pll
+# --
+print("\n $0 \n")

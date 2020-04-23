@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: dictionary comprehension example count letters
+# key: dic-example-1
+# --
+# I used a dictionary comprehension. For each letter in the input
+# string, I make the key the letter itself ("a" for example), and the
+# corresponding value is the result of running count() of that letter
+# in the string.
+dic = {letter: string.count(letter) for letter in string}

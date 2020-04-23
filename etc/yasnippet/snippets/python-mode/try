@@ -1,0 +1,7 @@
+# key: try
+# name: try
+# --
+try:
+    $1
+except ${2:Exception}:
+    print("$0")

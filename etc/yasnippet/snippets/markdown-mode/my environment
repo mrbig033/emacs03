@@ -1,0 +1,19 @@
+# -*- mode: snippet -*-
+# name: my environment
+# key: myenv
+# --
+### My Environment
+
+- **OS**: MX Linux 19
+- **$ uname -r**: 4.19.0-6-amd64
+- [dotfiles](https://github.com/mrbig033/dotfiles)
+- **i3wm** version 4.16.1 
+- [~/.config/i3](https://github.com/mrbig033/dotfiles/blob/master/i3/config)
+- **GNU Emacs** 26.3 (build 1, x86_64-pc-linux-gnu, X toolkit, Xaw3d scroll bars) of 2020-01-31
+- [~/.emacs.d](https://github.com/mrbig033/emacs02)
+- [init.org](https://github.com/mrbig033/emacs02/blob/master/init.org)
+- [init.el](https://github.com/mrbig033/emacs02/blob/master/init.el)
+
+### Issue
+
+$0

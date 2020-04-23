@@ -1,0 +1,1 @@
+((dired+ :fetcher url :url "https://www.emacswiki.org/emacs/download/dired+.el"))

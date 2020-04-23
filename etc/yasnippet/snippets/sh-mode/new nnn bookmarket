@@ -1,0 +1,5 @@
+# key: n
+# name: new nnn bookmarket
+# --
+${1:letter}:~/${2:location};
+$0

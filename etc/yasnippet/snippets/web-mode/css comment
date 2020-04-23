@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: css comment
+# key: cos
+# --
+/* $0 */

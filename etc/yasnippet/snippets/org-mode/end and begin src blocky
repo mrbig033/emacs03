@@ -1,0 +1,7 @@
+# key: begend
+# name: end and begin src block
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+#+END_SRC
+ $0
+#+BEGIN_SRC emacs-lisp

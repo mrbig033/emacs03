@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: my org options templates
+# key: opt
+# --
+#+OPTIONS: toc:nil, num:2, date:nil, html-postamble:nil, broken-links:nil

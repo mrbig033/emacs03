@@ -1,0 +1,4 @@
+# key: bs
+# name: border top right bottom left
+# --
+border: ${top} ${right} ${bottom} ${left};

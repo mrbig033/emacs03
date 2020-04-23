@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: disable/enable formatting (fmt)
+# key: fmt
+# fmt: off
+$0
+# fmt: on

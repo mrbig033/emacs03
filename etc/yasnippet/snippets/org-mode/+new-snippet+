@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: will's shell
+# key: wss
+# --
+#+BEGIN_SRC shell
+$will@peggy:\$ dog
+
+$1
+
+#+END_SRC
+
+$0

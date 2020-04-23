@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: ten cities list example
+# key: cities
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))  
+# --
+cities = [
+    "New Mexico",
+    "Kansas",
+    "Massachusetts",
+    "Georgia",
+    "New Hampshire",
+    "Oregon",
+    "Delaware",
+    "Connecticut",
+]

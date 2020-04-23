@@ -1,0 +1,17 @@
+# -*- mode: snippet -*-
+# name: cidades
+# key: cid
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil)) 
+# --
+cidades = [
+    "Florianópolis",
+    "Porto Velho",
+    "Teresina",
+    "Goiânia",
+    "Porto Alegre",
+    "Natal",
+    "Rio Branco" "Campo Grande",
+    "Boa Vista",
+    "Belo Horizonte",
+    "São Luís",
+]

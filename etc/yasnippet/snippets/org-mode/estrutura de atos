@@ -1,0 +1,20 @@
+# -*- mode: snippet -*-
+# name: estrutura de atos
+# key: atos
+# --
+* TODO Ato I [0/3]                                                   :ignore:
+** TODO Apresentação [0/1]                                          :ignore:
+** TODO Incidente Incitante [/]
+** TODO Ponto de Virada I [/]
+* TODO Ato II [0/3]
+** TODO Primeira Metade [0/2]
+*** TODO Pós PV I
+*** TODO Pinça I
+** TODO Midpoint [/]
+** TODO Segunda Metade [0/3]
+*** TODO Pós Midpoint
+*** TODO Pinça II
+*** TODO Ponto de Virada II
+* TODO Ato III [0/2]
+** TODO Clímax
+** TODO Resolução

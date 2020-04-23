@@ -1,0 +1,5 @@
+# key: inv
+# name: org logic INVALID
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil) (yas-after-exit-snippet-hook 'evil-normal-state))
+# --
+*INVALID*.$0

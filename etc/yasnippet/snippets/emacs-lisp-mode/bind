@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: bind
+# key: bind
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))  
+# --
+  :bind (("C-r" . undo-propose)
+         :map evil-normal-state-map
+         ("C-r" . undo-propose)
+         :map evil-visual-state-map
+         ("C-r" . undo-propose)
+         :map evil-insert-state-map
+         ("C-r" . undo-propose))

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: variable with dic()
+# key: dict
+# --
+${1:variable} = dict(${2:key}=$(3:value))

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: upcase text
+# key: upcase
+# --
+${1:$$(upcase yas-text)}
