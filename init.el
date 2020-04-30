@@ -479,7 +479,6 @@
    "C-0"     'evil-execute-macro
    "C-c 0"     'evil-execute-macro
    "M-y" 'my-yank-pop
-   "C-x m"   'evil-record-macro
    "C-,"     'evil-window-prev
    "C-."     'evil-window-next
    "C-/"     'my-term-below
@@ -1063,13 +1062,13 @@
 (use-package org-pomodoro
   :after org
   :init
-  (add-hook 'org-pomodoro-finished-hook 'org-clock-goto)
-  (add-hook 'org-pomodoro-long-break-finished-hook 'org-clock-goto)
-  (add-hook 'org-pomodoro-short-break-finished-hook 'org-clock-goto)
+  ;; (add-hook 'org-pomodoro-finished-hook 'org-clock-goto)
+  ;; (add-hook 'org-pomodoro-long-break-finished-hook 'org-clock-goto)
+  ;; (add-hook 'org-pomodoro-short-break-finished-hook 'org-clock-goto)
   :config
   (setq org-pomodoro-length 25
         org-pomodoro-long-break-length 20
-        org-pomodoro-short-break-length 5
+        org-pomodoro-short-break-length 8
         org-pomodoro-long-break-frequency 4
         org-pomodoro-ask-upon-killing t
         org-pomodoro-manual-break 't
@@ -2268,7 +2267,7 @@ _n_: next sexp
     _i_: in    _m_: recent   _e_: set effort  ^_r_: timer
     _o_: out   _c_: cancel   _a_: change \"    _ps_: pomo strt
     _l_: last  _s_: started  _d_: done        ^_pg_: pomo goto
-    _y_: show  _t_: todo     _g_: goto
+    _y_: show  _t_: todo     _g_: goto        ^_po_: pomo only
 "
 
   ("q" nil)
@@ -2290,7 +2289,8 @@ _n_: next sexp
   ("r" hydra-org-timer/body)
   ("ps" my-org-started-with-pomodoro)
   ("pg" my-org-goto-clock-and-start-pomodoro)
-  ("pd" my-org-todo-done-pomodoro))
+  ("pd" my-org-todo-done-pomodoro)
+  ("po" org-pomodoro))
 
 (defhydra hydra-org-agenda (:color blue :hint nil :exit nil :foreign-keys nil)
   "
@@ -2806,7 +2806,7 @@ _n_: next sexp
   :config
 
   (setq eyebrowse-wrap-around t)
-  (setq eyebrowse-new-workspace t)
+  (setq eyebrowse-new-workspace nil)
   (setq eyebrowse-mode-line-style 'smart)
   (setq eyebrowse-switch-back-and-forth t)
   (setq eyebrowse-mode-line-left-delimiter " [ ")
@@ -3005,6 +3005,7 @@ with the scratch buffer."
   :bind (:map ranger-mode-map
               ("i"          . ranger-go)
               (";"          . evil-ex)
+              ("SPC" . my-ranger-toggle-mark)
               ("tp"         . delete-file)
               ("<escape>"   . ranger-close)
               ("r"          . ranger-close)
@@ -3178,11 +3179,6 @@ with the scratch buffer."
     (ranger-toggle-mark)
     (ranger-next-file 1))
 
-  (defun my-ranger-toggle-mark ()
-    (interactive)
-    (ranger-toggle-mark)
-    (ranger-next-file 1))
-
   (defun ranger-find-file-in-workspace ()
     (interactive)
     (ranger-find-file)
@@ -3199,14 +3195,19 @@ with the scratch buffer."
   (setq which-key-idle-delay 0.5))
 
 (use-package super-save
-  :disabled
+  ;; :disabled
   :config
+
   (setq super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
   (setq-default super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
 
+  (setq super-save-exclude '("\\.pdf" "+new-snippet+"))
+  (setq-default super-save-exclude '("\\.pdf" "+new-snippet+"))
+
+
   (setq auto-save-default nil
-        super-save-idle-duration 1
-        super-save-auto-save-when-idle t
+        super-save-idle-duration 5
+        super-save-auto-save-when-idle nil
         auto-save-file-name-transforms `((".*" "~/emacs-profiles/my-emacs/var/temp" t)))
 
   (setq super-save-hook-triggers '(mouse-leave-buffer-hook focus-out-hook))
@@ -3686,8 +3687,6 @@ with the scratch buffer."
     "k" 'pdf-view-previous-line-or-previous-page
     "p" 'pdf-view-previous-page
     "n" 'pdf-view-next-page
-    "," 'pdf-view-previous-page
-    "." 'pdf-view-next-page
     "w" 'pdf-view-fit-width-to-window
     "C-0" 'pdf-view-fit-height-to-window
     ;; "<left>" 'eyebrowse-prev-window-config
@@ -4618,13 +4617,13 @@ with the scratch buffer."
     "C-w"))
 
 (use-package flycheck
-  :defer t
-  :init
-  (eval-after-load 'flycheck
-    '(flycheck-add-mode 'html-tidy 'html-mode))
+  ;; :defer t
+  ;; :init
+  ;; (eval-after-load 'flycheck
+  ;;   '(flycheck-add-mode 'html-tidy 'html-mode))
 
-  (eval-after-load 'flycheck
-    '(flycheck-add-mode 'css-stylelint 'css-mode))
+  ;; (eval-after-load 'flycheck
+  ;;   '(flycheck-add-mode 'css-stylelint 'css-mode))
   ;; (add-hook 'flycheck-mode-hook 'flycheck-buffer)
   :ensure t
   :config
@@ -4642,7 +4641,7 @@ with the scratch buffer."
         flycheck-idle-change-delay 0.5
         flycheck-clang-pedantic t
         flycheck-gcc-pedantic t
-        flycheck-python-mypy-executable "~/.pyenv/shims/mypy"
+        ;; flycheck-python-mypy-executable "~/.pyenv/shims/mypy"
         flycheck-check-syntax-automatically '(idle-change mode-enabled)
         flycheck-sh-shellcheck-executable "/usr/local/bin/shellcheck"))
 
@@ -4992,6 +4991,8 @@ with the scratch buffer."
 
   (general-define-key
    :keymaps 'elpy-mode-map
+   "C-x m" 'elpy-multiedit
+   "C-x ESC" 'elpy-multiedit-stop
    "C-c d" 'elpy-doc)
 
   (defun my/elpy-switch-to-buffer ()
@@ -5038,7 +5039,7 @@ with the scratch buffer."
     (my-company-idle-two-prefix-one-quiet)
     (highlight-numbers-mode +1)
     (blacken-mode +1)
-    (importmagic-mode +1)
+    ;; (importmagic-mode +1)
     (elpy-enable +1)
     (flymake-mode -1))
   (add-to-list 'company-backends 'company-jedi)
@@ -5256,7 +5257,8 @@ with the scratch buffer."
   (setq blacken-line-length 79))
 
 (use-package importmagic
-  :after python
+  ;; :after python
+  :disabled
   :config
   (setq importmagic-python-interpreter "~/.pyenv/shims/python")
   (setq importmagic-be-quiet t)
@@ -5625,8 +5627,10 @@ with the scratch buffer."
 
   (setq auto-save-timeout 30)
   (setq auto-save-interval 150)
-  ;; (auto-save-mode +1)
-  (auto-save-visited-mode -1))
+  (auto-save-mode -1)
+  (auto-save-visited-mode -1)
+  (setq-default auto-save-visited-mode nil)
+  )
 
 (use-package prog-mode
   :ensure nil
@@ -6863,7 +6867,6 @@ with the scratch buffer."
     (clone-indirect-buffer-other-window (buffer-name) "1" nil)
     (evil-window-move-far-right))
 
-  ;; completion-list-mode
   (defun my-other-window ()
     (interactive)
     (other-window -1))
@@ -6878,16 +6881,13 @@ with the scratch buffer."
         pcomplete-autolist 't
         pcomplete-ignore-case 't)
 
-  ;; (defun my-quit-warning-window ()
-  ;;   (interactive)
-  ;;   (quit-windows-on "*Warnings*"))
-
   ;; https://www.emacswiki.org/emacs/QuotedInsert
   (setq read-quoted-char-radix 10)
 
   (setq use-dialog-box nil)
   (setq kill-whole-line 't)
-;;;; WINDOWS ;;;;
+
+  ;;;; WINDOWS ;;;;
   (setq window-resize-pixelwise t)
   (setq recenter-positions '(top middle bottom))
 
@@ -6983,9 +6983,9 @@ with the scratch buffer."
   (setq-default indent-tabs-mode nil)
 
   (global-visual-line-mode +1)
-  ;; (setq truncate-lines t)
-  ;; (setq-default truncate-lines t)
-  )
+
+  (auto-save-mode -1)
+  (auto-save-visited-mode -1))
 
 (use-package eval
   :defer t
