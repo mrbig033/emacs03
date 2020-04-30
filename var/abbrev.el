@@ -488,6 +488,10 @@
 
 (define-abbrev-table 'idl-mode-abbrev-table '())
 
+(define-abbrev-table 'image-dired-display-image-mode-abbrev-table '())
+
+(define-abbrev-table 'image-dired-thumbnail-mode-abbrev-table '())
+
 (define-abbrev-table 'inferior-python-mode-abbrev-table '())
 
 (define-abbrev-table 'ivy-occur-grep-mode-abbrev-table '())
@@ -619,7 +623,11 @@
 
 (define-abbrev-table 'python-mode-abbrev-table '())
 
-(define-abbrev-table 'python-mode-skeleton-abbrev-table '())
+(define-abbrev-table 'python-mode-skeleton-abbrev-table
+  '(
+   ))
+
+(define-abbrev-table 'quickrun--mode-abbrev-table '())
 
 (define-abbrev-table 'ranger-mode-abbrev-table '())
 
@@ -642,7 +650,7 @@
 (define-abbrev-table 'snippet-mode-abbrev-table
   '(
     ("chs" "${1:$$(yas-choose-value '(\"option1\" \"option2\" \"option3\"))}" nil 2)
-    ("exp" "# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))" nil 5)
+    ("exp" "# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))" nil 6)
    ))
 
 (define-abbrev-table 'special-mode-abbrev-table '())

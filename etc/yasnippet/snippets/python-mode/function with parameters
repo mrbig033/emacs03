@@ -1,4 +1,4 @@
-# key: def
+# key: deff
 # name: function with parameters
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
 # --

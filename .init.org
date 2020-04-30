@@ -17011,3 +17011,14 @@ with the scratch buffer."
   :config
   (undohist-initialize))
 #+END_SRC
+*** 2020-04-23 Thursday
+**** poet
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-04-23 Thu 19:36
+:ARCHIVE_FILE: ~/emacs-profiles/my-emacs/init.org
+:ARCHIVE_OLPATH: Appearance/themes
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package poet-theme)
+#+END_SRC

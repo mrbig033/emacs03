@@ -41,7 +41,7 @@
                         'selective-display
                         (string-to-vector "."))
 
-;; (menu-bar-mode nil)
+(menu-bar-mode nil)
 (setq-default menu-bar-mode nil)
 (setq menu-bar-mode nil)
 (setq-default indent-tabs-mode nil)
@@ -63,7 +63,7 @@
       undo-limit 320000
       custom-safe-themes t
       inhibit-read-only nil
-      confirm-kill-emacs nil
+      confirm-kill-emacs t
       focus-follows-mouse t
       evil-want-keybinding nil
       initial-buffer-choice nil
@@ -75,8 +75,8 @@
       inhibit-startup-buffer-menu t
       initial-major-mode 'scratch-mode
       custom-file (concat udir ".emacs-custom.el")
-      default-frame-alist '((font . "Input Mono Light 17")))
-
+      default-frame-alist '((font . "Input Mono Light 18")))
+(setq parens-require-spaces nil)
 (blink-cursor-mode 0)
 
 ;; (server-start)
@@ -113,6 +113,19 @@
            (unless (eq face 'default)
              (set-face-attribute face nil :height 1.0))))
 
+
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
 (use-package evil
   :init
@@ -189,10 +202,7 @@
               ("gi"                . cool-moves-open-line-above)
               ("M-,"               . nswbuff-switch-to-previous-buffer)
               ("M-."               . nswbuff-switch-to-next-buffer)
-
-              ;; ("M-f"               . nswbuff-switch-to-next-buffer)
-              ;; ("M-b"               . nswbuff-switch-to-previous-buffer)
-
+              ("g."               . evil-repeat)
               ("C-a"                 . evil-numbers/inc-at-pt))
 
   :bind (:map evil-visual-state-map
@@ -235,10 +245,12 @@
               ("M-,"               . nswbuff-switch-to-previous-buffer)
               ("M-."               . nswbuff-switch-to-next-buffer)
               ("C-S-x"             . evil-numbers/dec-at-p)
-              ("C-S-a"             . evil-numbers/inc-at-pt))
+              ("C-S-a"             . evil-numbers/inc-at-pt)
+              ("g."               . evil-repeat))
 
   :bind (:map evil-insert-state-map
-              ("C-c 0" . my-insert-ordinal-masculine)
+              ("C-8" . my-insert-square-brackets)
+              ("C-(" . my-insert-curly-braces)
               ("C-r" . undo-fu-only-redo)
               ("<mouse-2>" . my-kill-this-buffer)
               ("C-."               . nil)
@@ -262,6 +274,8 @@
 
   :bind (:map evil-ex-completion-map
               ("<insert>"          . yank)
+              ("C-8" . my-insert-square-brackets)
+              ("C-(" . my-insert-curly-braces)
               ("C-h"               . delete-backward-char)
               ("C-k"               . kill-line)
               ("C-d"               . delete-char)
@@ -269,9 +283,12 @@
               ("C-b"               . backward-char)
               ("C-u"               . my-backward-kill-line))
 
-  :bind (:map evil-operator-state-map
-              ("<escape>"          . evil-normal-state))
   :config
+
+  (general-define-key
+   :keymaps 'evil-ex-search-keymap
+   "C-s"    'previous-history-element)
+
 
   (general-unbind '(evil-normal-state-map
                     evil-insert-state-map
@@ -317,10 +334,6 @@
     (kill-visual-line)
     (evil-insert-state))
 
-  (general-define-key
-   :keymaps 'evil-ex-search-keymap
-   "C-s"    'previous-history-element)
-
   ;; next-history-element
   (evil-mode +1))
 
@@ -349,9 +362,9 @@
 (use-package evil-org
   :config
 
-  (general-nvmap
-    :keymaps 'evil-org-mode-map
-    "C-c l" 'evil-org-org-insert-heading-respect-content-below)
+  ;; (general-nvmap
+  ;;   :keymaps 'evil-org-mode-map
+  ;;   "C-c l" 'evil-org-org-insert-heading-respect-content-below)
 
   (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
   (global-evil-surround-mode 1))
@@ -400,9 +413,9 @@
     (interactive)
     (evil-swap-keys-add-pair "$" "4"))
 
-  (defun evil-swap-keys-pound-curly-braces ()
+  (defun evil-swap-keys-three-curly-braces ()
     (interactive)
-    (evil-swap-keys-add-pair "€" "{"))
+    (evil-swap-keys-add-pair "3" "{"))
 
   (defun evil-swap-keys-comma-semicolon ()
     (interactive)
@@ -426,9 +439,8 @@
 
   (general-define-key
    :keymaps  'global
-   "M-3" 'counsel-projectile-switch-to-buffer
-   "M-1" 'eyebrowse-prev-window-config
-   "M-2" 'eyebrowse-next-window-config
+   "M-q" 'eyebrowse-prev-window-config
+   "M-w" 'eyebrowse-next-window-config
    "M-7" 'make-frame
    "M-8" 'other-frame
    "M-9"     'delete-other-windows
@@ -454,11 +466,13 @@
    "C-x c" 'quick-calc
    "C-c i" 'pbcopy
    "§" 'helm-resume
+   "C-S-s" 'helm-resume
    "C-s" 'helm-swoop-without-pre-input
+   "C--" 'helm-swoop
    "C-c u" 'revert-buffer
    "M-'"    'delete-window
    "M-r" 'ivy-switch-buffer
-   "M-t" 'counsel-projectile-switch-to-buffer
+   "M-;" 'counsel-projectile-switch-to-buffer
    "M-s" 'last-buffer
    "C-x s" 'my-shell-below
    "M-ç" 'insert-char
@@ -502,7 +516,6 @@
   (general-define-key
    :states   '(normal visual insert)
    "<f12>"   'man
-   "C--"     'man
    "M-9"     'delete-other-windows
    "M-0"     'quit-window
    "C-c a"   'align-regexp
@@ -570,7 +583,8 @@
   (remove-hook 'org-cycle-hook #'org-optimize-window-after-visibility-change)
 
   :bind (:map org-src-mode-map
-              ("C-c DEL" . org-edit-src-exit))
+              ("C-c DEL" . org-edit-src-exit)
+              ("C-c RET" . my-eval-buffer-and-leave-org-source))
   :config
 
   (defun my-org-agenda-goto ()
@@ -702,8 +716,8 @@
 
   (general-nvmap
     :keymaps 'org-src-mode-map
-    "DEL" 'org-edit-src-exit
-    "<backspace>" 'org-edit-src-exit)
+    "DEL" 'my-eval-buffer-and-leave-org-source
+    "<backspace>" 'my-eval-buffer-and-leave-org-source)
 
   (general-define-key
    :keymaps 'org-mode-map
@@ -721,6 +735,12 @@
     (org-todo "STRT")
     (org-pomodoro))
 
+  (defun my-org-goto-clock-and-start-pomodoro ()
+    (interactive)
+    (org-clock-goto)
+    (org-todo "STRT")
+    (org-pomodoro))
+
   (defun my-org-started-no-clock ()
     (interactive)
     (org-todo "STRT"))
@@ -728,6 +748,11 @@
   (defun my-org-todo-done ()
     (interactive)
     (org-todo "DONE"))
+
+  (defun my-org-todo-done-pomodoro ()
+    (interactive)
+    (org-todo "DONE")
+    (org-pomodoro))
 
   (defun my-org-todo ()
     (interactive)
@@ -960,7 +985,7 @@
         (plist-put org-format-latex-options :scale 1.3))
 
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "STRT(s)" "|" "DONE(d)")))
+        '((sequence "TODO(t!)" "STRT(s!)" "|" "DONE(d!)")))
 
   (setq org-file-apps (quote ((auto-mode . emacs)
                               ("\\.mm\\'" . default)
@@ -1042,15 +1067,21 @@
   (add-hook 'org-pomodoro-long-break-finished-hook 'org-clock-goto)
   (add-hook 'org-pomodoro-short-break-finished-hook 'org-clock-goto)
   :config
-  (setq org-pomodoro-length 15 ;; 25 x 0.6
-        org-pomodoro-long-break-length 12. ;; 20 * 0.6
-        org-pomodoro-short-break-length 3 ;; 5 * 0.6
+  (setq org-pomodoro-length 25
+        org-pomodoro-long-break-length 20
+        org-pomodoro-short-break-length 5
+        org-pomodoro-long-break-frequency 4
         org-pomodoro-ask-upon-killing t
-        org-pomodoro-keep-killed-pomodoro-time t
+        org-pomodoro-manual-break 't
+        org-pomodoro-keep-killed-pomodoro-time nil
         org-pomodoro-time-format "%.2m"
         org-pomodoro-short-break-format "SHORT: %s"
         org-pomodoro-long-break-format "LONG: %s"
         org-pomodoro-format "P: %s"))
+
+(straight-use-package '(apheleia :host github :repo "raxod502/apheleia"))
+(setq apheleia-formatters '((black "black" "-") (brittany "brittany" file) (prettier npx "prettier" file) (gofmt "gofmt") (terraform "terraform" "fmt" "-")))
+;; (apheleia-global-mode +1)
 
 (use-package yequake)
 
@@ -1067,7 +1098,8 @@
         auto-package-update-delete-old-versions t
         auto-package-update-hide-results t
         auto-package-update-prompt-before-update t)
-  (auto-package-update-maybe))
+  ;; (auto-package-update-maybe)
+  )
 
 (define-derived-mode scratch-mode
   text-mode "scratch")
@@ -1098,7 +1130,6 @@
   (add-hook 'after-init-hook 'benchmark-init/deactivate))
 
 (use-package beacon
-  :disabled
   ;; :if window-system
   :init (add-hook 'beacon-dont-blink-predicates
                   (lambda () (bound-and-true-p centered-cursor-mode)))
@@ -1147,8 +1178,8 @@
         unkillable-buffers '("^\\*scratch\\*$"
                              "^init.org$"
                              "^agenda.org$"
-                             "^bashtasks.org$"
-                             "^bashnotes.org$"
+                             "^pytasks.org$"
+                             "^pynotes.org$"
                              "*Racket REPL*"
 
                              ))
@@ -1267,7 +1298,7 @@
 ;; (autoload 'enable-auto-capitalize-mode "auto-capitalize" "Enable `auto-capitalize' minor mode in this buffer." t)
 
 (use-package helm
-  :disabled
+  ;; :disabled
   :init
   (add-hook 'helm-occur-mode-hook 'previous-history-element)
   :config
@@ -1392,6 +1423,7 @@
   (general-unbind 'ivy-minibuffer-map
     :with 'ivy-next-line
     [remap counsel-projectile-switch-to-buffer]
+    [remap ivy-switch-buffer]
     [remap transpose-chars]
     [remap transpose-words]
     [remap counsel-bookmark])
@@ -1596,7 +1628,6 @@
   (general-define-key
    :keymaps 'override
    "C-c ," 'hydra-yasnippet/body
-   "M-;" 'hydra-yasnippet/body
    "<f1>" 'hydra-help/body)
 
   (general-unbind 'hydra-base-map
@@ -1608,11 +1639,11 @@
   "
     ^
     ^Python^
-    ^^^^^-----------------------------------------
+    ^^^^^-------------------------------------------
     _r_: run term    _c_: copy eror  _B_: pdb
     _s_: quickshell  _d_: goto def   _a_: scratch
     _P_: prev error  _b_: go back    _o_: doc
-    _n_: next error  _D_: docs       _l_: lorem
+    _n_: next error  _D_: docs       _RET_: flycheck
 
 "
 
@@ -1627,17 +1658,17 @@
   ("c" flycheck-copy-errors-as-kill)
 
   ("d" elpy-goto-definition)
-  ("RET" elpy-goto-definition)
   ("b" pop-tag-mark)
   ("<C-return>" dumb-jump-back)
-
 
   ("g" engine/search-python-3)
   ("D" engine/search-python-3-docs)
   ("B" my-pdb)
   ("a" my-goto-python-scratch)
   ("o" elpy-doc)
-  ("l" lorem-ipsum-insert-sentences))
+  ("RET" hydra-flycheck-mode/body)
+
+  )
 
 (defhydra hydra-racket-mode (:color blue :hint nil :foreign-keys run)
   "
@@ -1691,24 +1722,23 @@
   "
 ^
     ^Flycheck^
-    ---------------------------------------------------
-    _a_: check buffer          _e_: display error at point
-    _b_: go to first error     _f_: explain error at point
-    _c_: go to previous error  _g_: clear errors
-    _d_: go to next error      _h_: flycheck mode
+    ^^^--------------------------------------
+    _a_: check buffer    _e_: error at point
+    _b_: first error     _f_: clear errors
+    _c_: previous error  _h_: flycheck mode
 
 "
   ("q" nil)
   ("<escape>" nil)
-  ("RET" hydra-flycheck-list-mode/body)
+  ("M-m" nil)
+  ("RET" flycheck-list-errors)
 
   ("a" flycheck-buffer)
   ("b" flycheck-first-error)
   ("c" flycheck-previous-error)
   ("d" flycheck-next-error)
   ("e" flycheck-display-error-at-point)
-  ("f" flycheck-explain-error-at-point)
-  ("g" flycheck-clear)
+  ("f" flycheck-clear)
   ("h" flycheck-mode))
 
 (defhydra hydra-prog-modes (:color blue :hint nil :foreign-keys run)
@@ -1919,16 +1949,15 @@
 (defhydra hydra-window (:color blue :hint nil :exit nil :foreign-keys nil)
   "
 
-    ^Resize        ^Split
-    ^^^-----------------------------
-    _H_: width+     _h_: left
-    _L_: width-     _l_: righ
-    _K_: height     _k_: up
-    _J_: height     _j_: down
-    _b_: balance    _z_: registers
-    _r_: botright
-    _z_: zoom mode
-"
+  ^Resize                 ^^^Split
+  ^^^^^^^^^---------------------------------------------------------------------
+  _h_: width+  _k_: height+  _b_: balance    _gh_: left  _gk_: up    _gb_: botright
+  _l_: width-  _j_: height-  _z_: zoom mode  _gl_: righ  _gj_: down
+
+
+
+
+  "
   ("<escape>" nil)
   ("RET" nil)
 
@@ -1937,13 +1966,18 @@
   ("J" my-evil-dec-height :exit nil)
   ("K" my-evil-inc-height :exit nil)
 
-  ("h" split-window-horizontally)
-  ("j" my-split-vertically)
-  ("k" split-window-below)
-  ("l" my-split-right)
+  ("h" my-evil-inc-width-small :exit nil)
+  ("l" my-evil-dec-width-small :exit nil)
+  ("j" my-evil-dec-height-small :exit nil)
+  ("k" my-evil-inc-height-small :exit nil)
+
+  ("gh" split-window-horizontally)
+  ("gj" my-split-vertically)
+  ("gk" split-window-below)
+  ("gl" my-split-right)
 
   ("b" balance-windows :exit t)
-  ("r" my-evil-botright)
+  ("gb" my-evil-botright)
 
   ("z" zoom-mode))
 
@@ -2029,7 +2063,7 @@ _n_: next sexp
     ^^^^^^^^^-------------------------------------------------------------------------------------------
     _g_: copy dir         _i_: i3 reload     _a_: global abbrev  _c_: clone buffer _u_: update packages
     _f_: copy filepath    _3_: i3 restart    _m_: mode abbrev    _W_: write file
-    _n_: copy filename    _pa_: packages     _e_: edit abbrevs   _d_: desktop
+    _n_: copy filename    _e_: edit abbrevs   _d_: desktop
     _E_: lines by length  _w_: count words   _s_: check parens   _l_: load theme
 
 
@@ -2232,8 +2266,8 @@ _n_: next sexp
   "
 
     _i_: in    _m_: recent   _e_: set effort  ^_r_: timer
-    _o_: out   _c_: cancel   _a_: change \"    _p_: pomodoro
-    _l_: last  _s_: started  _d_: done
+    _o_: out   _c_: cancel   _a_: change \"    _ps_: pomo strt
+    _l_: last  _s_: started  _d_: done        ^_pg_: pomo goto
     _y_: show  _t_: todo     _g_: goto
 "
 
@@ -2254,7 +2288,9 @@ _n_: next sexp
   ("t" my-org-todo)
   ("g" org-clock-goto)
   ("r" hydra-org-timer/body)
-  ("p" my-org-started-with-pomodoro))
+  ("ps" my-org-started-with-pomodoro)
+  ("pg" my-org-goto-clock-and-start-pomodoro)
+  ("pd" my-org-todo-done-pomodoro))
 
 (defhydra hydra-org-agenda (:color blue :hint nil :exit nil :foreign-keys nil)
   "
@@ -2739,28 +2775,29 @@ _n_: next sexp
 :ensure t)
 
 (use-package windmove
-:config
-(setq windmove-wrap-around t)
-(general-nvmap
-:keymaps 'override
-"M-h" 'windmove-left
-"M-l" 'windmove-right
-"M-j" 'windmove-down
-"M-k" 'windmove-up)
+  :config
+  (setq windmove-wrap-around t)
+  (general-nvmap
+    :keymaps 'override
+    "M-h" 'windmove-left
+    "M-l" 'windmove-right
+    "M-j" 'windmove-down
+    "M-k" 'windmove-up
+    "s-u" 'windmove-up)
 
-(general-define-key
-:keymaps 'override
-"M-h" 'windmove-left
-"M-l" 'windmove-right
-"M-j" 'windmove-down
-"M-k" 'windmove-up)
+  (general-define-key
+   :keymaps 'override
+   "M-h" 'windmove-left
+   "M-l" 'windmove-right
+   "M-j" 'windmove-down
+   "M-k" 'windmove-up)
 
-(general-define-key
-:keymaps 'override
-"<M-up>" 'windmove-up
-"<M-left>" 'windmove-left
-"<M-down>" 'windmove-down
-"<M-right>" 'windmove-right))
+  (general-define-key
+   :keymaps 'override
+   "<M-up>" 'windmove-up
+   "<M-left>" 'windmove-left
+   "<M-down>" 'windmove-down
+   "<M-right>" 'windmove-right))
 
 (use-package eyebrowse
   :ensure t
@@ -2852,7 +2889,7 @@ with the scratch buffer."
   :config
   (general-nvmap
     :keymaps 'i3wm-config-mode-map
-    "<backspace>" 'org-edit-src-exit))
+    "<backspace>" 'my-eval-buffer-and-leave-org-source))
 
 (use-package cool-moves
   :load-path "~/emacs-profiles/my-emacs/etc/custom_lisp/cool-moves"
@@ -2919,7 +2956,7 @@ with the scratch buffer."
         nswbuff-display-intermediate-buffers t
         nswbuff-buffer-list-function 'nswbuff-projectile-buffer-list)
 
-  (setq nswbuff-exclude-mode-regexp "Buffer-menu-mode\\|Info-mode\\|Man-mode\\|calc-mode\\|calendar-mode\\|compilation-mode\\|completion-list-mode\\|dired-mode\\|fundamental-mode\\|gnus-mode\\|help-mode\\|helpful-mode\\|ibuffer-mode\\|lisp-interaction-mode\\|magit-auto-revert-mode\\|magit-blame-mode\\|magit-blame-read-only-mode\\|magit-blob-mode\\|magit-cherry-mode\\|magit-diff-mode\\|magit-diff-mode\\|magit-file-mode\\|magit-log-mode\\|magit-log-select-mode\\|magit-merge-preview-mode\\|magit-mode\\|magit-process-mode\\|magit-reflog-mode\\|magit-refs-mode\\|magit-repolist-mode\\|magit-revision-mode\\|magit-stash-mode\\|magit-stashes-mode\\|magit-status-mode\\|magit-submodule-list-mode\\|magit-wip-after-apply-mode\\|magit-wip-after-save-local-mode\\|magit-wip-after-save-mode\\|magit-wip-before-change-mode\\|magit-wip-initial-backup-mode\\|magit-wip-mode\\|minibuffer-inactive-mode\\|occur-mode\\|org-agenda-mode\\|org-src-mode\\|pdf-view-mode\\|ranger-mode\\|special-mode\\|special-mode\\|term-mode\\|treemacs-mode\\|messages-buffer-mode")
+  (setq nswbuff-exclude-mode-regexp "Buffer-menu-mode\\|Info-mode\\|Man-mode\\|calc-mode\\|calendar-mode\\|compilation-mode\\|completion-list-mode\\|dired-mode\\|fundamental-mode\\|gnus-mode\\|help-mode\\|helpful-mode\\|ibuffer-mode\\|lisp-interaction-mode\\|magit-auto-revert-mode\\|magit-blame-mode\\|magit-blame-read-only-mode\\|magit-blob-mode\\|magit-cherry-mode\\|magit-diff-mode\\|magit-diff-mode\\|magit-file-mode\\|magit-log-mode\\|magit-log-select-mode\\|magit-merge-preview-mode\\|magit-mode\\|magit-process-mode\\|magit-reflog-mode\\|magit-refs-mode\\|magit-repolist-mode\\|magit-revision-mode\\|magit-stash-mode\\|magit-stashes-mode\\|magit-status-mode\\|magit-submodule-list-mode\\|magit-wip-after-apply-mode\\|magit-wip-after-save-local-mode\\|magit-wip-after-save-mode\\|magit-wip-before-change-mode\\|magit-wip-initial-backup-mode\\|magit-wip-mode\\|minibuffer-inactive-mode\\|occur-mode\\|org-agenda-mode\\|org-src-mode\\|ranger-mode\\|special-mode\\|special-mode\\|term-mode\\|treemacs-mode\\|messages-buffer-mode")
 
   (setq nswbuff-exclude-buffer-regexps '(".*elc"
                                          "^#.*#$"
@@ -2941,9 +2978,10 @@ with the scratch buffer."
 (use-package dired
   :ensure nil
   :config
-  (setq delete-by-moving-to-trash t)
-  (setq dired-listing-switches "-lsh")
-  (setq dired-hide-details-mode t))
+  (setq dired-use-ls-dired nil
+        delete-by-moving-to-trash t
+        dired-listing-switches "-lsh"
+        dired-hide-details-mode t))
 
 (use-package dired+
   :quelpa (dired+ :fetcher url :url "https://www.emacswiki.org/emacs/download/dired+.el")
@@ -3075,8 +3113,8 @@ with the scratch buffer."
      (list
       (read-char-choice
        "
-    d : dotfiles  o : org        r: creative  q: quit
-    e : emacs     s : scripts    c: documents
+    d : dotfiles  o : org        r: creative   q: quit
+    e : emacs     s : scripts    c: documents  f: config
     h : home      n : downloads  t: study
   > "
        '(?a ?b ?c ?d ?e ?f ?g ?h ?i ?j ?l ?m ?n ?o ?p ?q ?r ?s ?t ?v ?z ?w))))
@@ -3093,6 +3131,7 @@ with the scratch buffer."
               ('t "~/Documents/Study")
               ('n "~/Downloads")
               ('r "~/creative")
+              ('f "~/.config")
 
               ('q nil)))
            (alt-option
@@ -3160,9 +3199,10 @@ with the scratch buffer."
   (setq which-key-idle-delay 0.5))
 
 (use-package super-save
+  :disabled
   :config
-  (setq super-save-exclude '("\\.py" "+new-snippet+"))
-  (setq-default super-save-exclude '("\\.py" "+new-snippet+"))
+  (setq super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
+  (setq-default super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
 
   (setq auto-save-default nil
         super-save-idle-duration 1
@@ -3483,171 +3523,178 @@ with the scratch buffer."
   :config
   (setq bitly-access-token "3026d7e8b1a0f89da10740c69fd77b4b3293151e"))
 
-;; (use-package pdf-tools
-;;   ;; :defer t
-;;   :init
+(use-package pdf-tools
+  ;; :defer t
+  :init
 
-;;   (add-hook 'pdf-view-mode-hook 'my-pdf-view-settings)
-;;   (add-hook 'pdf-tools-enabled-hook 'my-pdf-view-settings)
+  (add-hook 'pdf-view-mode-hook 'my-pdf-view-settings)
+  (add-hook 'pdf-tools-enabled-hook 'my-pdf-view-settings)
 
-;;   (add-hook 'pdf-outline-buffer-mode-hook 'my-pdf-outline-settings)
+  (add-hook 'pdf-outline-buffer-mode-hook 'my-pdf-outline-settings)
 
-;;   :config
-;;   (setq pdf-view-continuous t)
-;;   (setq pdf-view-resize-factor 1.15)
-;;   (setq pdf-view-display-size 'fit-page)
-;;   (setq pdf-misc-size-indication-minor-mode t)
-;;   (setq pdf-annot-activate-created-annotations t)
+  :config
+  (setq pdf-view-continuous t)
+  (setq pdf-view-resize-factor 1.15)
+  (setq pdf-view-display-size 'fit-page)
+  (setq pdf-misc-size-indication-minor-mode t)
+  (setq pdf-annot-activate-created-annotations t)
 
-;;   (defun my-call-ranger-from-pdf ()
-;;     (interactive)
-;;     (last-buffer)
-;;     (ranger))
+  (defun my-call-ranger-from-pdf ()
+    (interactive)
+    (last-buffer)
+    (ranger))
 
-;;   (defun pdf-occur-goto-quit ()
-;;     (interactive)
-;;     (pdf-occur-goto-occurrence)
-;;     (quit-windows-on "*PDF-Occur*"))
+  (defun pdf-occur-goto-quit ()
+    (interactive)
+    (pdf-occur-goto-occurrence)
+    (quit-windows-on "*PDF-Occur*"))
 
-;;   (defun my-pdf-delete-occur-window ()
-;;     (interactive)
-;;     (quit-windows-on "*PDF-Occur*"))
+  (defun my-pdf-delete-occur-window ()
+    (interactive)
+    (quit-windows-on "*PDF-Occur*"))
 
-;;   (defun my-pdf-view-settings ()
-;;     (interactive)
-;;     (pdf-annot-minor-mode 1)
-;;     (pdf-links-minor-mode 1)
-;;     ;; (line-no-numbers)
-;;     (pdf-history-minor-mode 1)
-;;     (tab-jump-out-mode -1))
+  (defun my-pdf-view-settings ()
+    (interactive)
+    (pdf-annot-minor-mode 1)
+    (pdf-links-minor-mode 1)
+    ;; (line-no-numbers)
+    (pdf-history-minor-mode 1)
+    (tab-jump-out-mode -1))
 
-;;   (defun my-pdf-outline-settings ()
-;;     (interactive)
-;;     (outline-minor-mode 1)
-;;     (hl-line-mode 1))
+  (defun my-pdf-outline-settings ()
+    (interactive)
+    (outline-minor-mode 1)
+    (hl-line-mode 1))
 
-;;   (general-define-key
-;;    :keymaps 'pdf-outline-minor-mode-map
-;;    "<escape>" 'pdf-outline-quit)
+  (general-define-key
+   :keymaps 'pdf-outline-minor-mode-map
+   "<escape>" 'pdf-outline-quit)
 
-;;   (general-define-key
-;;    :keymaps 'pdf-outline-buffer-mode-map
-;;    "gh" 'pdf-outline-up-heading
-;;    "<tab>" 'pdf-outline-toggle-subtree
-;;    "<escape>" 'pdf-outline-quit)
+  (general-define-key
+   :keymaps 'pdf-outline-buffer-mode-map
+   "gh" 'pdf-outline-up-heading
+   "<tab>" 'pdf-outline-toggle-subtree
+   "<escape>" 'pdf-outline-quit)
 
-;;   (general-nmap
-;;     :keymaps 'pdf-outline-buffer-mode-map
-;;     "<escape>" 'pdf-outline-quit)
+  (general-nmap
+    :keymaps 'pdf-outline-buffer-mode-map
+    "<escape>" 'pdf-outline-quit)
 
-;;   ;; (general-nmap
-;;   ;;   :keymaps 'pdf-view-mode-map
-;;   ;;   "<escape>" 'last-buffer)
+  ;; (general-nmap
+  ;;   :keymaps 'pdf-view-mode-map
+  ;;   "<escape>" 'last-buffer)
 
-;;   (general-unbind 'pdf-outline-buffer-mode-map
-;;     :with 'pdf-outline-quit
-;;     [remap my-quiet-save-buffer])
+  (general-unbind 'pdf-outline-buffer-mode-map
+    :with 'pdf-outline-quit
+    [remap my-quiet-save-buffer])
 
-;;   (general-unbind 'pdf-view-mode-map
-;;     :with 'my-call-ranger-from-pdf
-;;     [remap ranger])
+  (general-unbind 'pdf-view-mode-map
+    :with 'my-call-ranger-from-pdf
+    [remap ranger])
 
-;;   (general-unbind 'pdf-view-mode-map
-;;     :with 'my-kill-this-buffer
-;;     "Q")
 
-;;   (general-nvmap
-;;     :keymaps 'pdf-annot-list-mode-map
-;;     "q" 'pdf-outline-quit-and-kill
-;;     "<escape>" 'pdf-outline-quit)
+  (general-unbind 'pdf-view-mode-map
+    :with 'ignore
+    [remap save-buffer]
+    [remap my-save-buffer]
+    [remap my-ranger-deer])
 
-;;   (general-nvmap
-;;     :keymaps 'pdf-occur-buffer-mode-map
-;;     "go" 'pdf-occur-goto-occurrence
-;;     "<return>" 'pdf-occur-goto-quit)
+  (general-unbind 'pdf-view-mode-map
+    :with 'my-kill-this-buffer
+    "Q")
 
-;;   (general-define-key
-;;    :keymaps 'pdf-view-mode-map
-;;    "w" 'pdf-view-fit-width-to-window
-;;    "<return>" 'quick-calc
-;;    "<kp-enter>" 'quick-calc
-;;    "J" 'pdf-view-next-page
-;;    "j" 'pdf-view-next-line-or-next-page
-;;    "K" 'pdf-view-previous-page
-;;    "k" 'pdf-view-previous-line-or-previous-page
-;;    "p" 'pdf-view-previous-page
-;;    "n" 'pdf-view-next-page
+  (general-nvmap
+    :keymaps 'pdf-annot-list-mode-map
+    "q" 'pdf-outline-quit-and-kill
+    "<escape>" 'pdf-outline-quit)
 
-;;    "C-x i" 'org-noter-insert-precise-note
+  (general-nvmap
+    :keymaps 'pdf-occur-buffer-mode-map
+    "go" 'pdf-occur-goto-occurrence
+    "<return>" 'pdf-occur-goto-quit)
 
-;;    "C-c v v" 'pdf-view-set-slice-using-mouse
-;;    "C-c v r" 'pdf-view-reset-slice
-;;    "C-c C-c" 'pdf-annot-add-highlight-markup-annotation
-;;    "M-o" 'pdf-history-backward
-;;    "M-i" 'pdf-history-forward
-;;    "H" 'pdf-history-backward
-;;    "L" 'pdf-history-forward)
+  (general-define-key
+   :keymaps 'pdf-view-mode-map
+   "w" 'pdf-view-fit-width-to-window
+   "<return>" 'quick-calc
+   "<kp-enter>" 'quick-calc
+   "J" 'pdf-view-next-page
+   "j" 'pdf-view-next-line-or-next-page
+   "K" 'pdf-view-previous-page
+   "k" 'pdf-view-previous-line-or-previous-page
+   "p" 'pdf-view-previous-page
+   "n" 'pdf-view-next-page
 
-;;   (general-unbind 'pdf-view-mode-map
-;;     :with 'pdf-view-fit-page-to-window
-;;     [remap evil-beginning-of-visual-line])
+   "C-x i" 'org-noter-insert-precise-note
 
-;;   (general-unbind 'pdf-view-mode-map
-;;     :with 'pdf-outline
-;;     [remap evil-toggle-fold])
+   "C-c V v" 'pdf-view-set-slice-using-mouse
+   "C-c V r" 'pdf-view-reset-slice
+   "C-c C-c" 'pdf-annot-add-highlight-markup-annotation
+   "M-o" 'pdf-history-backward
+   "M-i" 'pdf-history-forward
+   "H" 'pdf-history-backward
+   "L" 'pdf-history-forward)
 
-;;   (general-define-key
-;;    :keymaps 'pdf-annot-edit-contents-minor-mode-map
-;;    "C-c C-c" 'pdf-annot-edit-contents-abort
-;;    "<C-return>" 'pdf-annot-edit-contents-commit)
+  (general-unbind 'pdf-view-mode-map
+    :with 'pdf-view-fit-page-to-window
+    [remap evil-beginning-of-visual-line])
 
-;;   (general-nvmap
-;;     :keymaps 'pdf-annot-edit-contents-minor-mode-map
-;;     "c" 'pdf-annot-edit-contents-abort)
+  (general-unbind 'pdf-view-mode-map
+    :with 'pdf-outline
+    [remap evil-toggle-fold])
 
-;;   (general-nvmap
-;;     :keymaps 'pdf-view-mode-map
-;;     ;; "M-s" 'last-buffer
-;;     "<kp-enter>" 'quick-calc
-;;     "i" 'org-noter-insert-note
-;;     "I" 'org-noter-insert-precise-note
-;;     "C-l" 'counsel-bookmark
-;;     "C-c C-c" 'pdf-annot-add-highlight-markup-annotation
-;;     "c" 'pdf-annot-add-highlight-markup-annotation
-;;     "H" 'pdf-history-backward
-;;     "L" 'pdf-history-forward
-;;     "S" 'pdf-occur
-;;     "C-s" 'pdf-occur
-;;     "ss" 'my-pdf-delete-occur-window
-;;     "q" 'last-buffer
-;;     "gf" 'find-pdf-keys
-;;     "TAB" 'pdf-outline
-;;     "D" 'pdf-annot-delete
-;;     "gp" 'pdf-view-goto-page
-;;     ";" 'hydra-org-noter/body
-;;     "f" 'pdf-links-action-perform
-;;     "gr" 'pdf-view-jump-to-register
-;;     "t" 'pdf-annot-add-text-annotation
-;;     "gm" 'pdf-view-position-to-register
-;;     "h" 'pdf-view-scroll-up-or-next-page
-;;     "l" 'pdf-view-scroll-down-or-previous-page
-;;     "<down>" 'pdf-view-next-line-or-next-page
-;;     "<up>" 'pdf-view-previous-line-or-previous-page
-;;     "J" 'pdf-view-next-page
-;;     "j" 'pdf-view-next-line-or-next-page
-;;     "K" 'pdf-view-previous-page
-;;     "k" 'pdf-view-previous-line-or-previous-page
-;;     "p" 'pdf-view-previous-page
-;;     "n" 'pdf-view-next-page
-;;     "," 'pdf-view-previous-page
-;;     "." 'pdf-view-next-page
-;;     "w" 'pdf-view-fit-width-to-window
-;;     "C-0" 'pdf-view-fit-height-to-window
-;;     ;; "<left>" 'eyebrowse-prev-window-config
-;;     ;; "<right>" 'eyebrowse-next-window-config
-;;     "C-c h" 'pdf-annot-add-highlight-markup-annotation)
+  (general-define-key
+   :keymaps 'pdf-annot-edit-contents-minor-mode-map
+   "C-c C-c" 'pdf-annot-edit-contents-abort
+   "<C-return>" 'pdf-annot-edit-contents-commit)
 
-;;   (pdf-loader-install))
+  (general-nvmap
+    :keymaps 'pdf-annot-edit-contents-minor-mode-map
+    "c" 'pdf-annot-edit-contents-abort)
+
+  (general-nvmap
+    :keymaps 'pdf-view-mode-map
+    "<kp-enter>" 'quick-calc
+    "i" 'org-noter-insert-note
+    "I" 'org-noter-insert-precise-note
+    "C-l" 'counsel-bookmark
+    "C-c C-c" 'pdf-annot-add-highlight-markup-annotation
+    "c" 'pdf-annot-add-highlight-markup-annotation
+    "H" 'pdf-history-backward
+    "L" 'pdf-history-forward
+    "S" 'pdf-occur
+    "C-s" 'pdf-occur
+    "ss" 'my-pdf-delete-occur-window
+    "M-s" 'last-buffer
+    "q" 'last-buffer
+    "gf" 'find-pdf-keys
+    "TAB" 'pdf-outline
+    "D" 'pdf-annot-delete
+    "gp" 'pdf-view-goto-page
+    ";" 'hydra-org-noter/body
+    "f" 'pdf-links-action-perform
+    "gr" 'pdf-view-jump-to-register
+    "t" 'pdf-annot-add-text-annotation
+    "gm" 'pdf-view-position-to-register
+    "h" 'pdf-view-scroll-up-or-next-page
+    "l" 'pdf-view-scroll-down-or-previous-page
+    "<down>" 'pdf-view-next-line-or-next-page
+    "<up>" 'pdf-view-previous-line-or-previous-page
+    "J" 'pdf-view-next-page
+    "j" 'pdf-view-next-line-or-next-page
+    "K" 'pdf-view-previous-page
+    "k" 'pdf-view-previous-line-or-previous-page
+    "p" 'pdf-view-previous-page
+    "n" 'pdf-view-next-page
+    "," 'pdf-view-previous-page
+    "." 'pdf-view-next-page
+    "w" 'pdf-view-fit-width-to-window
+    "C-0" 'pdf-view-fit-height-to-window
+    ;; "<left>" 'eyebrowse-prev-window-config
+    ;; "<right>" 'eyebrowse-next-window-config
+    "C-c h" 'pdf-annot-add-highlight-markup-annotation)
+
+  (pdf-loader-install))
 
 (defun my-write-insert-mode ()
   (interactive)
@@ -3747,6 +3794,10 @@ with the scratch buffer."
   (evil-define-key 'insert org-mode-map (kbd "DEL") 'evil-delete-backward-char-and-join)
   (message " insert and edit"))
 
+(use-package json-mode
+  :defer t
+  :ensure t)
+
 (use-package company
   :defer t
   :config
@@ -3758,11 +3809,11 @@ with the scratch buffer."
    "C-j"      nil
    "C-k"      'company-abort
    "M--"      'my-company-comp-first-with-dash
-   ;; "M-="      'my-company-comp-first-with-equal
+   "M-="      'my-company-comp-first-with-equal
    "M-q"      'my-company-comp-first
    "M-w"      'my-company-comp-first-with-paren
    "M-e"      'my-company-comp-with-paren
-   "M-r"      'my-company-comp-with-dot
+   "M-."      'my-company-comp-with-dot
    "M-f"      'my-company-comp-first-with-square-bracket
    "M-j"      'my-company-comp-first-space
    "C-j"      'company-complete
@@ -3892,7 +3943,7 @@ with the scratch buffer."
     (interactive)
     (company-select-next)
     (company-complete)
-    (insert "=")
+    (insert " = ")
     (company-complete))
 
   (defun my-company-comp-first-with-dash ()
@@ -4182,8 +4233,9 @@ with the scratch buffer."
 (use-package yasnippet
   :defer 5
   :init
-  ;; (add-hook 'snippet-mode-hook (lambda () (super-save-mode -1)))
+  (add-hook 'snippet-mode-hook (lambda () (super-save-mode -1)))
   (add-hook 'yas-before-expand-snippet-hook 'evil-insert-state)
+
   :config
   (setq yas--default-user-snippets-dir (concat udir "etc/yasnippet"))
   (setq yas-also-auto-indent-first-line t
@@ -4354,12 +4406,12 @@ with the scratch buffer."
     "M-q")
 
   (general-unbind 'lispy-mode-map
-    :with 'org-edit-src-exit
+    :with 'my-eval-buffer-and-leave-org-source
     [remap lispy-mark-symbol])
 
   (general-unbind 'lispy-mode-map
     :states '(normal visual)
-    :with 'org-edit-src-exit
+    :with 'my-eval-buffer-and-leave-org-source
     "<backspace>"))
 
 (use-package lispyville
@@ -4526,18 +4578,6 @@ with the scratch buffer."
     (insert "()")
     (backward-char 1))
 
-  (defun my-insert-bracket ()
-    (interactive)
-    (evil-insert-state)
-    (insert "[]")
-    (backward-char 1))
-
-  (defun my-insert-curly-brackets (&optional arg)
-    (interactive "P")
-    (evil-insert-state)
-    (insert "[]")
-    (insert-pair arg ?\{ ?\}))
-
   (defun my-insert-9 ()
     (interactive)
     (evil-insert-state)
@@ -4598,7 +4638,7 @@ with the scratch buffer."
   (setq flycheck-mode-line nil
         flycheck-gcc-warnings nil
         flycheck-clang-warnings nil
-        flycheck-display-errors-delay 0.5
+        flycheck-display-errors-delay 0.3
         flycheck-idle-change-delay 0.5
         flycheck-clang-pedantic t
         flycheck-gcc-pedantic t
@@ -4989,26 +5029,19 @@ with the scratch buffer."
     (interactive)
     (electric-operator-mode +1)
     (flycheck-mode +1)
-    ;; (origami-mode -1)
     (yafolding-mode +1)
     (rainbow-delimiters-mode +1)
     (highlight-operators-mode +1)
-    ;; (evil-swap-keys-swap-double-single-quotes)
-    ;; (evil-swap-keys-swap-colon-semicolon)
-    ;; (evil-swap-keys-swap-underscore-dash)
-    ;; (evil-swap-keys-swap-square-curly-brackets)
+    (evil-swap-keys-swap-double-single-quotes)
+    (evil-swap-keys-swap-underscore-dash)
     (smartparens-strict-mode +1)
-    ;; (git-auto-commit-mode +1)
     (my-company-idle-two-prefix-one-quiet)
     (highlight-numbers-mode +1)
-    ;; (anaconda-mode +1)
-    ;; (hs-minor-mode +1)
-    ;; (pyenv-mode +1)
-    (importmagic-mode +1)
     (blacken-mode +1)
+    (importmagic-mode +1)
     (elpy-enable +1)
     (flymake-mode -1))
-
+  (add-to-list 'company-backends 'company-jedi)
   ;; (setq-local company-backends '(company-jedi
   ;;                                company-dabbrev-code
   ;;                                company-files
@@ -5028,11 +5061,7 @@ with the scratch buffer."
     (line-numbers)
     (subword-mode 1)
     (electric-operator-mode)
-    (company-mode )
-    ;; (my/company-idle-one-prefix-one-quiet)
-    ;; (evil-swap-keys-swap-double-single-quotes)
-    (evil-swap-keys-swap-colon-semicolon))
-
+    (company-mode))
   ;; PYTHON KEYS ;;
   (general-define-key
    :keymaps 'inferior-python-mode-map
@@ -5047,7 +5076,6 @@ with the scratch buffer."
 
   (general-unbind 'inferior-python-mode-map
     :with 'ignore
-    [remap my/quiet-save-buffer]
     [remap save-buffer]
     [remap evil-normal-state])
 
@@ -5055,8 +5083,14 @@ with the scratch buffer."
     :with 'elpy-folding-toggle-at-point
     [remap hs-toggle-hiding])
 
+  (general-unbind 'python-mode-map
+    :with 'my-python-shebang
+    [remap my-bash-shebang])
+
   (general-define-key
    :keymaps 'python-mode-map
+   "<escape>" 'my-save-buffer-only
+   "<M-return>" 'blacken-buffer
    "M-a" 'python-nav-backward-statement
    "M-e" 'python-nav-forward-statement
    "C-S-p" 'python-nav-backward-sexp
@@ -5065,16 +5099,12 @@ with the scratch buffer."
    "C-x m" 'elpy-multiedit-python-symbol-at-point
    "C-x M" 'elpy-multiedit-stop
    "C-c g" 'my/counsel-ag-python
-   "M-m" 'blacken-buffer
+   "M-m" 'flycheck-first-error
    "C-c p" 'my/python-make-print
    "C-c f" 'my/python-make-fstring
    "C-c DEL" 'my/erase-python-file
    "C-c =" 'my/erase-python-file-and-yank
    )
-
-  (general-unbind 'python-mode-map
-    :with 'my/python-save-buffer
-    [remap my/quiet-save-buffer])
 
   (general-unbind 'python-mode-map
     :with 'yafolding-hide-all
@@ -5092,8 +5122,8 @@ with the scratch buffer."
     "C-S-n" 'python-nav-forward-sexp
     "C-ç" 'my/python-newline-beg
     "zi" 'hs-show-all
-    "<backspace>" 'org-edit-src-exit
-    "<C-return>" 'my-quickrun
+    "<backspace>" 'my-eval-buffer-and-leave-org-source
+    "<C-return>" 'quickrun
     "<tab>" 'elpy-folding-toggle-at-point
     "<tab>" 'elpy-folding-toggle-at-point
     "RET" 'hydra-python-mode/body
@@ -5122,7 +5152,7 @@ with the scratch buffer."
     :keymaps 'python-mode-map
     "C-="   'my/python-colon-newline
     "C-ç" 'my/python-newline-beg
-    "<C-return>" 'my-quickrun
+    "<C-return>" 'quickrun
     "C-h" 'python-indent-dedent-line-backspace
     "M-a" 'python-nav-backward-statement
     "M-e" 'python-nav-forward-statement
@@ -5228,18 +5258,19 @@ with the scratch buffer."
 (use-package importmagic
   :after python
   :config
+  (setq importmagic-python-interpreter "~/.pyenv/shims/python")
   (setq importmagic-be-quiet t)
   (remove-hook 'python-mode-hook 'importmagic-mode))
 
 (use-package anaconda-mode
-  :ensure nil
+  :disabled
   :after python)
 
 (use-package company-jedi
   :after python
-  :init
-  (add-to-list 'company-backends 'company-jedi)
-  :ensure t)
+  :ensure t
+  :config
+  (add-to-list 'company-backends 'company-jedi))
 
 (use-package py-autopep8
   :after python
@@ -5293,15 +5324,13 @@ with the scratch buffer."
              (elmacro-mode " " "elmacro"))))
 
 (use-package dimmer
-  :disabled
   :config
   (setq dimmer-buffer-exclusion-regexps '("*LV*" "^ \\*Minibuf-[0-9]+\\*$" "^ \\*Echo.*\\*$")
         dimmer-fraction 0.2)
   (dimmer-mode +1))
 
 (use-package doom-modeline
-  :disabled
-  ;; :after doom-themes
+  :after doom-themes
   :init
   (add-hook 'doom-modeline-mode-hook 'setup-custom-doom-modeline)
   ;; Resolve lag:
@@ -5337,44 +5366,44 @@ with the scratch buffer."
         doom-modeline-buffer-file-name-style 'buffer-name)
 
   (doom-modeline-def-modeline 'my-simple-modeline
-    '(bar
-      workspace-name
-      window-number
-      modals
-      matches
-      buffer-info
-      remote-host
-      buffer-position
-      selection-info
-      " "
-      bar
-      word-count
-      )
+                              '(bar
+                                workspace-name
+                                window-number
+                                modals
+                                matches
+                                buffer-info
+                                remote-host
+                                buffer-position
+                                selection-info
+                                " "
+                                bar
+                                word-count
+                                )
 
-    '(objed-state
-      misc-info
-      persp-name
-      ;; fancy-battery
-      irc
-      mu4e
-      github
-      debug
-      lsp
-      minor-modes
-      input-method
-      indent-info
-      buffer-encoding
-      major-mode
-      "    "))
+                              '(objed-state
+                                misc-info
+                                persp-name
+                                ;; fancy-battery
+                                irc
+                                mu4e
+                                github
+                                debug
+                                lsp
+                                minor-modes
+                                input-method
+                                indent-info
+                                buffer-encoding
+                                major-mode
+                                "    "))
 
   (defun setup-custom-doom-modeline ()
     (interactive)
     (doom-modeline-set-modeline 'my-simple-modeline 'default))
 
   (doom-modeline-def-modeline 'my-minimal-modeline
-    '("")
+                              '("")
 
-    '(misc-info))
+                              '(misc-info))
 
   (defun setup-minimal-doom-modeline ()
     (interactive)
@@ -5387,6 +5416,7 @@ with the scratch buffer."
 :ensure t)
 
 (use-package telephone-line
+  :disabled
   :config
   (telephone-line-mode +1))
 
@@ -5397,16 +5427,15 @@ with the scratch buffer."
   (sml/setup))
 
 (use-package doom-themes
-  :disabled
+  ;; :disabled
   :config
   (doom-themes-org-config)
-  ;; (load-theme 'doom-dracula t)
+  (load-theme 'doom-dracula t)
   ;; (load-theme 'doom-gruvbox t)
   )
 
-(use-package poet-theme)
-
 (use-package dracula-theme
+  :disabled
   :config
   (setq dracula-enlarge-headings nil)
   (load-theme 'dracula t))
@@ -5764,10 +5793,7 @@ with the scratch buffer."
 
     (defun my-paragraph-backwards ()
       (interactive)
-      (forward-line)
-      (backward-paragraph)
-      (forward-line)
-      (back-to-indentation))
+      (backward-paragraph))
 
     (defun my-paragraph-forward ()
       (interactive)
@@ -6108,7 +6134,6 @@ with the scratch buffer."
     (evil-swap-keys-dollar-sign-four)
     (evil-swap-keys-comma-semicolon)
     (evil-swap-keys-swap-double-single-quotes)
-    (evil-swap-keys-pound-curly-braces)
     (evil-swap-keys-equal-zero))
 
   (defun my-shell-go-up ()
@@ -6275,9 +6300,9 @@ with the scratch buffer."
   (setq-default compilation-window-height 30)
   (setq compilation-window-height 30)
 
-  ;; (general-unbind 'compilation-mode-map
-  ;;   :with 'ignore
-  ;;   [remap my-quiet-save-buffer])
+  (general-unbind 'compilation-mode-map
+    :with 'quit-window
+    [remap my-save-buffer])
 
   (general-nvmap
     :keymaps 'compilation-mode-map
@@ -6631,17 +6656,6 @@ with the scratch buffer."
 
   :config
 
-  ;; (defun my-save-and-indent ()
-  ;;   (interactive)
-  ;;   (evil-ex-nohighlight)
-  ;;   (delete-trailing-whitespace)
-  ;;   ;; (my-indent-buffer)
-  ;;   (save-buffer))
-
-  ;; (general-unbind 'sh-mode-map
-  ;;   :with 'my-save-and-indent
-  ;;   [remap my-save-buffer])
-
   (general-define-key
    :keymaps 'sh-mode-map
    "M-RET" 'my-shfmt-fix-file-and-revert)
@@ -6649,16 +6663,6 @@ with the scratch buffer."
   (general-nvmap
     :keymaps 'sh-mode-map
     "RET" 'hydra-prog-mode/body)
-
-  ;; (defun my-shfmt-fix-file ()
-  ;;   (interactive)
-  ;;   (message "shfmt fix buffer" (buffer-file-name))
-  ;;   (shell-command (concat "shfmt -i 2 -s -w " (buffer-file-name))))
-
-  ;; (defun my-shfmt-fix-file-and-revert ()
-  ;;   (interactive)
-  ;;   (my-shfmt-fix-file)
-  ;;   (revert-buffer t t))
 
   (setq sh-basic-offset 2
         sh-indentation 2
@@ -6673,7 +6677,6 @@ with the scratch buffer."
     (evil-swap-keys-dollar-sign-four)
     (evil-swap-keys-comma-semicolon)
     (evil-swap-keys-swap-double-single-quotes)
-    (evil-swap-keys-pound-curly-braces)
     (evil-swap-keys-equal-zero))
 
   (add-to-list 'auto-mode-alist '("\\.inputrc\\'" . sh-mode))
@@ -7020,11 +7023,10 @@ with the scratch buffer."
   :ensure nil
   :config
   ;; (setq-default display-time-format "| %a, %H:%M |")
-  (setq-default display-time-format "| %a, %B %d | %H:%M")
+  (setq-default display-time-format "| %a, %B %d | %H:%M |")
   (setq-default display-time-default-load-average nil)
   ;; (display-time)
   ;; (display-time-mode +1)
-
   )
 
 (use-package minibuffer
@@ -7225,6 +7227,14 @@ with the scratch buffer."
     (find-file user-init-file))
   (message " file tangled and loaded"))
 
+(defun my-insert-curly-braces (&optional arg)
+  (interactive "P")
+  (insert-pair arg ?\{?\}))
+
+(defun my-insert-square-brackets (&optional arg)
+  (interactive "P")
+  (insert-pair arg ?\[?\]))
+
 (defun my-insert-ordinal-masculine ()
   (interactive)
   (evil-insert-state)
@@ -7292,10 +7302,12 @@ with the scratch buffer."
   (interactive)
   (evil-ex-nohighlight)
   (delete-trailing-whitespace)
-  (save-buffer)
-  ;; (redraw-display)
+  (save-buffer))
 
-  )
+(defun my-save-buffer-only ()
+  (interactive)
+  (evil-ex-nohighlight)
+  (save-buffer))
 
 (defun my-quiet-save-buffer ()
   (interactive)
@@ -7513,8 +7525,8 @@ with the scratch buffer."
   (interactive)
   (kill-region (point-min) (point-max))
   (insert "#!/usr/bin/env python3\n\n")
-  (insert "\"\"\" Docstring \"\"\"")
-  (insert "\n\n")
+  ;; (insert "\"\"\" Docstring \"\"\"")
+  ;; (insert "\n\n")
   (evil-insert-state))
 
 (defun whack-whitespace (arg)
@@ -7574,6 +7586,11 @@ with the scratch buffer."
   (interactive)
   (eval-buffer)
   (message " buffer evaluated"))
+
+(defun my-eval-buffer-and-leave-org-source ()
+  (interactive)
+  (eval-buffer)
+  (org-edit-src-exit))
 
 (defun last-buffer ()
   (interactive)
