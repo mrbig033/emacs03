@@ -132,7 +132,7 @@
   (setq evil-respect-visual-line-mode nil
         evil-want-integration t
         evil-want-keybinding nil
-        evil-jumps-cross-buffers nil
+        evil-jumps-cross-buffers t
         evil-ex-substitute-global t
         evil-want-Y-yank-to-eol t)
 
@@ -5050,6 +5050,7 @@ with the scratch buffer."
     (highlight-numbers-mode +1)
     (elpy-enable +1)
     (yafolding-mode +1)
+    (importmagic-mode +1)
     ;; (flymake-mode +1)
     (apheleia-mode +1))
 

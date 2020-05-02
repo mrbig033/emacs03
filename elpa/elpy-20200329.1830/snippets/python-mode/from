@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # name: from MOD import SYM
-# key: from
+# key: ffrom
 # group: Header
 # --
 from ${1:module} import ${2:symbol}
