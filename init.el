@@ -63,7 +63,7 @@
       undo-limit 320000
       custom-safe-themes t
       inhibit-read-only nil
-      confirm-kill-emacs t
+      confirm-kill-emacs nil
       focus-follows-mouse t
       evil-want-keybinding nil
       initial-buffer-choice nil
@@ -439,6 +439,8 @@
 
   (general-define-key
    :keymaps  'global
+   "M-p" 'backward-paragraph
+   "M-n" 'forward-paragraph
    "M-q" 'eyebrowse-prev-window-config
    "M-w" 'eyebrowse-next-window-config
    "M-7" 'make-frame
@@ -460,6 +462,7 @@
 
   (general-define-key
    :keymaps  'override
+   "C-x n" 'recursive-narrow-or-widen-dwim
    "C-c s" 'my-shell-full
    "C-c v"   'yank
    "C-x r" 'kill-ring-save
@@ -535,6 +538,7 @@
     "e"      'visible-mode
     ","      'olivetti-mode
     "\\"     'org-babel-tangle
+    "/"     'org-babel-tangle
     "."      'my-tangle-py-init.org-only
     "-"      'my-tangle-py-init.org-only-and-quit-window
     "d"      'my-dup-line
@@ -548,7 +552,6 @@
     "a"      'counsel-M-x
     "f"      'counsel-find-file
     "j"      'hydra-org-clock/body
-    "w"      'recursive-widen
     "g"      'counsel-grep
     "R"      'eyebrowse-rename-window-config
     "r"      'my-ranger-deer
@@ -715,8 +718,8 @@
 
   (general-nvmap
     :keymaps 'org-src-mode-map
-    "DEL" 'my-eval-buffer-and-leave-org-source
-    "<backspace>" 'my-eval-buffer-and-leave-org-source)
+    "DEL" 'org-edit-src-exit
+    "<backspace>" 'org-edit-src-exit)
 
   (general-define-key
    :keymaps 'org-mode-map
@@ -984,7 +987,7 @@
         (plist-put org-format-latex-options :scale 1.3))
 
   (setq org-todo-keywords
-        '((sequence "TODO(t!)" "STRT(s!)" "|" "DONE(d!)")))
+        '((sequence "TODO(t)" "STRT(s!)" "|" "DONE(d!)")))
 
   (setq org-file-apps (quote ((auto-mode . emacs)
                               ("\\.mm\\'" . default)
@@ -1061,25 +1064,42 @@
 
 (use-package org-pomodoro
   :after org
-  :init
-  ;; (add-hook 'org-pomodoro-finished-hook 'org-clock-goto)
-  ;; (add-hook 'org-pomodoro-long-break-finished-hook 'org-clock-goto)
-  ;; (add-hook 'org-pomodoro-short-break-finished-hook 'org-clock-goto)
   :config
-  (setq org-pomodoro-length 25
-        org-pomodoro-long-break-length 20
-        org-pomodoro-short-break-length 8
+  (setq org-pomodoro-offset 1
+        org-pomodoro-length (* 25 org-pomodoro-offset)
+        org-pomodoro-long-break-length (* 20 org-pomodoro-offset)
+        org-pomodoro-short-break-length (* 5 org-pomodoro-offset)
         org-pomodoro-long-break-frequency 4
-        org-pomodoro-ask-upon-killing t
-        org-pomodoro-manual-break 't
-        org-pomodoro-keep-killed-pomodoro-time nil
+        org-pomodoro-ask-upon-killing nil
+        org-pomodoro-manual-break nil
+        org-pomodoro-keep-killed-pomodoro-time t
         org-pomodoro-time-format "%.2m"
         org-pomodoro-short-break-format "SHORT: %s"
         org-pomodoro-long-break-format "LONG: %s"
         org-pomodoro-format "P: %s"))
 
+(use-package org-web-tools
+  :disabled
+  :after org)
+
+(use-package exec-path-from-shell
+  :init
+  (exec-path-from-shell-copy-env "PYENV_SHELL")
+  :config
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+
+(use-package which-key
+  :disabled)
+
 (straight-use-package '(apheleia :host github :repo "raxod502/apheleia"))
-(setq apheleia-formatters '((black "black" "-") (brittany "brittany" file) (prettier npx "prettier" file) (gofmt "gofmt") (terraform "terraform" "fmt" "-")))
+
+(setq apheleia-formatters '((black "black" "-")
+                            (brittany "brittany" file)
+                            (prettier npx "prettier" file)
+                            (gofmt "gofmt")
+                            (terraform "terraform" "fmt" "-")))
+
 ;; (apheleia-global-mode +1)
 
 (use-package yequake)
@@ -1178,10 +1198,8 @@
                              "^init.org$"
                              "^agenda.org$"
                              "^pytasks.org$"
-                             "^pynotes.org$"
-                             "*Racket REPL*"
-
-                             ))
+                             "^sct.py$"
+                             "*Racket REPL*"))
 
   ;; http://bit.ly/332kLj9
   (defun my-create-scratch-buffer nil
@@ -1949,9 +1967,9 @@
   "
 
   ^Resize                 ^^^Split
-  ^^^^^^^^^---------------------------------------------------------------------
-  _h_: width+  _k_: height+  _b_: balance    _gh_: left  _gk_: up    _gb_: botright
-  _l_: width-  _j_: height-  _z_: zoom mode  _gl_: righ  _gj_: down
+  ^^^^^^^^^^^--------------------------------------------------------------------
+  _h_: width+  _k_: height+  _b_: balance    _H_: left  _K_: up    _gb_: botright
+  _l_: width-  _j_: height-  _z_: zoom mode  _L_: righ  _J_: down
 
 
 
@@ -1960,20 +1978,15 @@
   ("<escape>" nil)
   ("RET" nil)
 
-  ("H" my-evil-inc-width :exit nil)
-  ("L" my-evil-dec-width :exit nil)
-  ("J" my-evil-dec-height :exit nil)
-  ("K" my-evil-inc-height :exit nil)
-
   ("h" my-evil-inc-width-small :exit nil)
   ("l" my-evil-dec-width-small :exit nil)
   ("j" my-evil-dec-height-small :exit nil)
   ("k" my-evil-inc-height-small :exit nil)
 
-  ("gh" split-window-horizontally)
-  ("gj" my-split-vertically)
-  ("gk" split-window-below)
-  ("gl" my-split-right)
+  ("H" split-window-horizontally)
+  ("J" my-split-vertically)
+  ("K" split-window-below)
+  ("L" my-split-right)
 
   ("b" balance-windows :exit t)
   ("gb" my-evil-botright)
@@ -2267,7 +2280,7 @@ _n_: next sexp
     _i_: in    _m_: recent   _e_: set effort  ^_r_: timer
     _o_: out   _c_: cancel   _a_: change \"    _ps_: pomo strt
     _l_: last  _s_: started  _d_: done        ^_pg_: pomo goto
-    _y_: show  _t_: todo     _g_: goto        ^_po_: pomo only
+    _y_: show  _t_: todo     _g_: goto        ^_pp_: pomo only
 "
 
   ("q" nil)
@@ -2290,7 +2303,7 @@ _n_: next sexp
   ("ps" my-org-started-with-pomodoro)
   ("pg" my-org-goto-clock-and-start-pomodoro)
   ("pd" my-org-todo-done-pomodoro)
-  ("po" org-pomodoro))
+  ("pp" org-pomodoro))
 
 (defhydra hydra-org-agenda (:color blue :hint nil :exit nil :foreign-keys nil)
   "
@@ -2806,7 +2819,7 @@ _n_: next sexp
   :config
 
   (setq eyebrowse-wrap-around t)
-  (setq eyebrowse-new-workspace nil)
+  (setq eyebrowse-new-workspace t)
   (setq eyebrowse-mode-line-style 'smart)
   (setq eyebrowse-switch-back-and-forth t)
   (setq eyebrowse-mode-line-left-delimiter " [ ")
@@ -2889,7 +2902,7 @@ with the scratch buffer."
   :config
   (general-nvmap
     :keymaps 'i3wm-config-mode-map
-    "<backspace>" 'my-eval-buffer-and-leave-org-source))
+    "<backspace>" 'org-edit-src-exit))
 
 (use-package cool-moves
   :load-path "~/emacs-profiles/my-emacs/etc/custom_lisp/cool-moves"
@@ -2981,7 +2994,12 @@ with the scratch buffer."
   (setq dired-use-ls-dired nil
         delete-by-moving-to-trash t
         dired-listing-switches "-lsh"
-        dired-hide-details-mode t))
+        dired-hide-details-mode t)
+
+  (defun my-dired-do-find-marked-files ()
+    (interactive)
+    (dired-do-find-marked-files)
+    (delete-other-windows)))
 
 (use-package dired+
   :quelpa (dired+ :fetcher url :url "https://www.emacswiki.org/emacs/download/dired+.el")
@@ -3005,7 +3023,8 @@ with the scratch buffer."
   :bind (:map ranger-mode-map
               ("i"          . ranger-go)
               (";"          . evil-ex)
-              ("SPC" . my-ranger-toggle-mark)
+              ("SPC"        . my-ranger-toggle-mark)
+              ("m"          . my-ranger-toggle-mark)
               ("tp"         . delete-file)
               ("<escape>"   . ranger-close)
               ("r"          . ranger-close)
@@ -3013,7 +3032,6 @@ with the scratch buffer."
               ("C-h"        . hydra-help/body)
               ("C-n"        . ranger-next-file)
               ("C-p"        . ranger-prev-file)
-              ("m"          . ranger-find-file)
               ("C-l"        . ranger-find-links-dir)
               ("zi"         . ranger-toggle-details)
               ("zp"         . ranger-preview-toggle)
@@ -3024,7 +3042,8 @@ with the scratch buffer."
               ("x"          . diredp-delete-this-file)
               ("d"          . dired-flag-file-deletion)
               ("<C-return>" . dired-do-find-marked-files)
-              ("<S-return>" . ranger-find-file-in-workspace))
+              ;; ("<S-return>" . ranger-find-file-in-workspace)
+              ("<S-return>" . my-dired-do-find-marked-files))
   :config
 
   (general-define-key
@@ -3116,7 +3135,7 @@ with the scratch buffer."
        "
     d : dotfiles  o : org        r: creative   q: quit
     e : emacs     s : scripts    c: documents  f: config
-    h : home      n : downloads  t: study
+    h : home      n : downloads  t: study      p: python
   > "
        '(?a ?b ?c ?d ?e ?f ?g ?h ?i ?j ?l ?m ?n ?o ?p ?q ?r ?s ?t ?v ?z ?w))))
     (message nil)
@@ -3133,6 +3152,7 @@ with the scratch buffer."
               ('n "~/Downloads")
               ('r "~/creative")
               ('f "~/.config")
+              ('p "~/Documents/Study/python")
 
               ('q nil)))
            (alt-option
@@ -3198,12 +3218,11 @@ with the scratch buffer."
   ;; :disabled
   :config
 
-  (setq super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
-  (setq-default super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
+  ;; (setq super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
+  ;; (setq-default super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
 
-  (setq super-save-exclude '("\\.pdf" "+new-snippet+"))
-  (setq-default super-save-exclude '("\\.pdf" "+new-snippet+"))
-
+  (setq super-save-exclude '("pdf" "\\.pdf" "+new-snippet+"))
+  (setq-default super-save-exclude '("pdf" "\\.pdf" "+new-snippet+"))
 
   (setq auto-save-default nil
         super-save-idle-duration 5
@@ -3213,29 +3232,19 @@ with the scratch buffer."
   (setq super-save-hook-triggers '(mouse-leave-buffer-hook focus-out-hook))
 
   (setq super-save-triggers
-        '(
-          undo
-          quickrun
+        '(quickrun
+          quit-window
           last-buffer
           windmove-up
           windmove-down
           windmove-left
           windmove-right
-          balance-windows
           switch-to-buffer
+          delete-window
           eyebrowse-close-window-config
           eyebrowse-create-window-config
           eyebrowse-next-window-config
-          eyebrowse-prev-window-config
-          eyebrowse-switch-to-window-config-1
-          eyebrowse-switch-to-window-config-2
-          eyebrowse-switch-to-window-config-3
-          eyebrowse-switch-to-window-config-4
-          eyebrowse-switch-to-window-config-5
-          eyebrowse-switch-to-window-config-6
-          eyebrowse-switch-to-window-config-7
-          eyebrowse-switch-to-window-config-8
-          eyebrowse-switch-to-window-config-9))
+          eyebrowse-prev-window-config))
 
   (auto-save-mode -1)
   (super-save-mode +1))
@@ -3246,6 +3255,7 @@ with the scratch buffer."
   :init
   (add-hook 'wordnut-mode-hook 'hl-line-mode)
   :config
+
   (setq wordnut-cmd "/usr/local/bin/wn"))
 
 (use-package aggressive-fill-paragraph
@@ -3534,7 +3544,7 @@ with the scratch buffer."
   (add-hook 'pdf-outline-buffer-mode-hook 'my-pdf-outline-settings)
 
   :config
-  (setq pdf-view-continuous t)
+  (setq pdf-view-continuous nil)
   (setq pdf-view-resize-factor 1.15)
   (setq pdf-view-display-size 'fit-page)
   (setq pdf-misc-size-indication-minor-mode t)
@@ -4642,14 +4652,15 @@ with the scratch buffer."
         flycheck-clang-pedantic t
         flycheck-gcc-pedantic t
         ;; flycheck-python-mypy-executable "~/.pyenv/shims/mypy"
+        ;; flycheck-python-mypy-executable nil
         flycheck-check-syntax-automatically '(idle-change mode-enabled)
         flycheck-sh-shellcheck-executable "/usr/local/bin/shellcheck"))
 
 (use-package flymake
-  :defer t
+  :disabled
   :ensure nil
   :init
-  (setq-default flymake-no-changes-timeout 0.2))
+  (setq-default flymake-no-changes-timeout 0.5))
 
 (use-package tab-jump-out
   :defer t
@@ -4966,10 +4977,10 @@ with the scratch buffer."
   (setq elpy-rpc-python-command "/Users/davi/.pyenv/shims/python")
   (setq elpy-autodoc-delay 3)
   (setq elpy-rpc-virtualenv-path 'current)
+
   (general-unbind 'normal elpy-mode-map
     :with 'yafolding-toggle-element
     [remap elpy-folding-toggle-at-point])
-
   (defun my/elpy-hooks ()
     (interactive)
     (my/disable-eldoc)
@@ -5030,7 +5041,6 @@ with the scratch buffer."
     (interactive)
     (electric-operator-mode +1)
     (flycheck-mode +1)
-    (yafolding-mode +1)
     (rainbow-delimiters-mode +1)
     (highlight-operators-mode +1)
     (evil-swap-keys-swap-double-single-quotes)
@@ -5038,11 +5048,13 @@ with the scratch buffer."
     (smartparens-strict-mode +1)
     (my-company-idle-two-prefix-one-quiet)
     (highlight-numbers-mode +1)
-    (blacken-mode +1)
-    ;; (importmagic-mode +1)
     (elpy-enable +1)
-    (flymake-mode -1))
+    (yafolding-mode +1)
+    ;; (flymake-mode +1)
+    (apheleia-mode +1))
+
   (add-to-list 'company-backends 'company-jedi)
+
   ;; (setq-local company-backends '(company-jedi
   ;;                                company-dabbrev-code
   ;;                                company-files
@@ -5091,7 +5103,7 @@ with the scratch buffer."
   (general-define-key
    :keymaps 'python-mode-map
    "<escape>" 'my-save-buffer-only
-   "<M-return>" 'blacken-buffer
+   "<M-return>" 'apheleia-format-buffer
    "M-a" 'python-nav-backward-statement
    "M-e" 'python-nav-forward-statement
    "C-S-p" 'python-nav-backward-sexp
@@ -5117,14 +5129,14 @@ with the scratch buffer."
 
   (general-nvmap
     :keymaps 'python-mode-map
+    "zi" 'yafolding-show-all
     "M-a" 'python-nav-backward-statement
     "M-e" 'python-nav-forward-statement
     "C-S-p" 'python-nav-backward-sexp
     "C-S-n" 'python-nav-forward-sexp
     "C-ç" 'my/python-newline-beg
-    "zi" 'hs-show-all
-    "<backspace>" 'my-eval-buffer-and-leave-org-source
-    "<C-return>" 'quickrun
+    "<backspace>" 'org-edit-src-exit
+    "<C-return>" 'my-quickrun
     "<tab>" 'elpy-folding-toggle-at-point
     "<tab>" 'elpy-folding-toggle-at-point
     "RET" 'hydra-python-mode/body
@@ -5153,7 +5165,7 @@ with the scratch buffer."
     :keymaps 'python-mode-map
     "C-="   'my/python-colon-newline
     "C-ç" 'my/python-newline-beg
-    "<C-return>" 'quickrun
+    "<C-return>" 'my-quickrun
     "C-h" 'python-indent-dedent-line-backspace
     "M-a" 'python-nav-backward-statement
     "M-e" 'python-nav-forward-statement
@@ -5287,6 +5299,9 @@ with the scratch buffer."
 (use-package yafolding
   :defer t)
 
+(use-package origami
+  :disabled)
+
 (use-package clipmon
   :defer nil
   :config
@@ -5368,44 +5383,44 @@ with the scratch buffer."
         doom-modeline-buffer-file-name-style 'buffer-name)
 
   (doom-modeline-def-modeline 'my-simple-modeline
-                              '(bar
-                                workspace-name
-                                window-number
-                                modals
-                                matches
-                                buffer-info
-                                remote-host
-                                buffer-position
-                                selection-info
-                                " "
-                                bar
-                                word-count
-                                )
+    '(bar
+      workspace-name
+      window-number
+      modals
+      matches
+      buffer-info
+      remote-host
+      buffer-position
+      selection-info
+      " "
+      bar
+      word-count
+      )
 
-                              '(objed-state
-                                misc-info
-                                persp-name
-                                ;; fancy-battery
-                                irc
-                                mu4e
-                                github
-                                debug
-                                lsp
-                                minor-modes
-                                input-method
-                                indent-info
-                                buffer-encoding
-                                major-mode
-                                "    "))
+    '(objed-state
+      misc-info
+      persp-name
+      ;; fancy-battery
+      irc
+      mu4e
+      github
+      debug
+      lsp
+      minor-modes
+      input-method
+      indent-info
+      buffer-encoding
+      major-mode
+      "    "))
 
   (defun setup-custom-doom-modeline ()
     (interactive)
     (doom-modeline-set-modeline 'my-simple-modeline 'default))
 
   (doom-modeline-def-modeline 'my-minimal-modeline
-                              '("")
+    '("")
 
-                              '(misc-info))
+    '(misc-info))
 
   (defun setup-minimal-doom-modeline ()
     (interactive)
@@ -5741,9 +5756,9 @@ with the scratch buffer."
     (evil-insert-state)
     (insert "9 "))
 
-  (general-unbind 'prog-mode-map
-    :with 'my-prog-save-buffer
-    [remap save-buffer])
+  ;; (general-unbind 'prog-mode-map
+  ;;   :with 'my-prog-save-buffer
+  ;;   [remap save-buffer])
 
   ;; https://www.emacswiki.org/emacs/autofillmode
   (defun comment-auto-fill ()
@@ -6939,8 +6954,7 @@ with the scratch buffer."
   (defun my-move-file-to-trash ()
     (interactive)
     (move-file-to-trash (buffer-name))
-    (kill-buffer)
-    (delete-window))
+    (kill-buffer))
 
   (defun my-move-file-to-trash-close-ws ()
     (interactive)
@@ -7022,10 +7036,10 @@ with the scratch buffer."
 (use-package time
   :ensure nil
   :config
-  ;; (setq-default display-time-format "| %a, %H:%M |")
-  (setq-default display-time-format "| %a, %B %d | %H:%M |")
-  (setq-default display-time-default-load-average nil)
-  ;; (display-time)
+  (setq display-time-format "| %a | %H:%M |"
+        display-time-interval (* 60 5)
+        display-time-default-load-average nil)
+
   ;; (display-time-mode +1)
   )
 

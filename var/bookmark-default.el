@@ -17,7 +17,7 @@
  (handler . pdf-view-bookmark-jump-handler))
 ("org-capture-last-stored"
  (filename . "~/org/Agenda/agenda.org")
- (front-context-string . "** TODO make aut")
- (rear-context-string . "2020-04-30 Thu]\n")
- (position . 418))
+ (front-context-string . "** TODO Map pdf-")
+ (rear-context-string . "2020-05-02 Sat]\n")
+ (position . 659))
 )
