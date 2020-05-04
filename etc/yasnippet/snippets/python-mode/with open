@@ -1,5 +1,5 @@
 # key: open
 # name: with open
 # --
-with open("${1:file}"${2:, "${3:mode}"}) as ${4:file}:
+with open("${1:file}"${2:, "${3:mode}"}) as ${4:f}:
     ${0:pass}

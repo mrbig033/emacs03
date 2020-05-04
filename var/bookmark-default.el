@@ -2,7 +2,15 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("PCC Working With Files"
+(("PCC TYI 10"
+ (filename . "~/Documents/Study/python/PCC.pdf")
+ (position . 1)
+ (page . 240)
+ (slice 0.14166700000000002 0 0.8738090000000001 1)
+ (size . fit-width)
+ (origin 0.0 . 0.11518324607329843)
+ (handler . pdf-view-bookmark-jump-handler))
+("PCC Working With Files"
  (filename . "~/Documents/Study/python/PCC.pdf")
  (position . 1)
  (page . 226)

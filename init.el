@@ -1071,7 +1071,7 @@
         org-pomodoro-short-break-length (* 5 org-pomodoro-offset)
         org-pomodoro-long-break-frequency 4
         org-pomodoro-ask-upon-killing t
-        org-pomodoro-manual-break nil
+        org-pomodoro-manual-break t
         org-pomodoro-keep-killed-pomodoro-time t
         org-pomodoro-time-format "%.2m"
         org-pomodoro-short-break-format "SHORT: %s"
@@ -3226,7 +3226,7 @@ with the scratch buffer."
   (setq-default super-save-exclude '("pdf" "\\.pdf" "+new-snippet+"))
 
   (setq auto-save-default nil
-        super-save-idle-duration 5
+        super-save-idle-duration 2
         super-save-auto-save-when-idle nil
         auto-save-file-name-transforms `((".*" "~/emacs-profiles/my-emacs/var/temp" t)))
 
@@ -3244,7 +3244,6 @@ with the scratch buffer."
           delete-window
           eyebrowse-close-window-config
           eyebrowse-create-window-config
-          eyebrowse-next-window-config
           eyebrowse-prev-window-config))
 
   (auto-save-mode -1)
@@ -5033,6 +5032,7 @@ with the scratch buffer."
   (defun my-python-hooks ()
     (interactive)
     (flymake-mode -1)
+    (toggle-truncate-lines +1)
     (electric-operator-mode +1)
     (flycheck-mode +1)
     (rainbow-delimiters-mode +1)
@@ -5045,6 +5045,7 @@ with the scratch buffer."
     (highlight-numbers-mode +1)
     (yafolding-mode +1)
     (apheleia-mode +1)
+    (importmagic-mode +1)
     (elpy-enable +1))
 
   (defun my-inferior-python-mode-hooks ()
@@ -5123,7 +5124,6 @@ with the scratch buffer."
 
   (general-define-key
    :keymaps 'python-mode-map
-   "<escape>" 'my-save-buffer-only
    "<M-return>" 'apheleia-format-buffer
    "M-a" 'python-nav-backward-statement
    "M-e" 'python-nav-forward-statement
@@ -5146,7 +5146,7 @@ with the scratch buffer."
 
   (general-nmap
     :keymaps 'python-mode-map
-    "<escape>" 'save-buffer)
+    "<escape>" 'my-prog-save-buffer)
 
   (general-nvmap
     :keymaps 'python-mode-map
