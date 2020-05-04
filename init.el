@@ -171,8 +171,8 @@
               ("gm"                . nil)
               ("z0"                . flyspell-correct-wrapper)
               ("C-k"               . my-kill-line)
-              ("F"                 . avy-goto-word-1-above)
-              ("f"                 . avy-goto-word-1-below)
+              ("F"                 . avy-goto-word-0-above)
+              ("f"                 . avy-goto-word-0-below)
               ("gf"                . evil-find-char)
               ("gF"                . evil-find-char-backward)
               ("C-."               . nil)
@@ -227,8 +227,8 @@
               ("\\"                . toggle-truncate-lines)
               ("Ç"                 . git-timemachine)
               ("z0"                . flyspell-correct-wrapper)
-              ("F"                 . avy-goto-word-1-above)
-              ("f"                 . avy-goto-word-1-below)
+              ("F"                 . avy-goto-word-0-above)
+              ("f"                 . avy-goto-word-0-below)
               ("."                 . counsel-org-capture)
               (","                 .  hydra-org-agenda/body)
               ("gx"                . evil-exchange)
@@ -531,7 +531,7 @@
   (leader
     :states  '(normal visual)
     :keymaps 'override
-    ";"      'hydra-magit-main/body
+    ";"      'my-eval-buffer
     "u"      'hydra-projectile-mode/body
     "p"      'hydra-packages/body
     "h"      'my-org-hooks
@@ -1070,13 +1070,14 @@
         org-pomodoro-long-break-length (* 20 org-pomodoro-offset)
         org-pomodoro-short-break-length (* 5 org-pomodoro-offset)
         org-pomodoro-long-break-frequency 4
-        org-pomodoro-ask-upon-killing nil
+        org-pomodoro-ask-upon-killing t
         org-pomodoro-manual-break nil
         org-pomodoro-keep-killed-pomodoro-time t
         org-pomodoro-time-format "%.2m"
         org-pomodoro-short-break-format "SHORT: %s"
         org-pomodoro-long-break-format "LONG: %s"
-        org-pomodoro-format "P: %s"))
+        org-pomodoro-format "P: %s"
+        ))
 
 (use-package org-web-tools
   :disabled
@@ -4627,40 +4628,28 @@ with the scratch buffer."
     "C-w"))
 
 (use-package flycheck
-  ;; :defer t
-  ;; :init
-  ;; (eval-after-load 'flycheck
-  ;;   '(flycheck-add-mode 'html-tidy 'html-mode))
-
-  ;; (eval-after-load 'flycheck
-  ;;   '(flycheck-add-mode 'css-stylelint 'css-mode))
-  ;; (add-hook 'flycheck-mode-hook 'flycheck-buffer)
   :ensure t
   :config
+
   (general-define-key
    :keymaps 'flycheck-mode-map
    :states '(normal visual insert)
    "ç" 'flycheck-display-error-at-point)
 
-  (setq-local flycheck-idle-change-delay 0.5)
-
   (setq flycheck-mode-line nil
         flycheck-gcc-warnings nil
         flycheck-clang-warnings nil
         flycheck-display-errors-delay 0.3
-        flycheck-idle-change-delay 0.5
+        flycheck-idle-change-delay 0.3
         flycheck-clang-pedantic t
         flycheck-gcc-pedantic t
-        ;; flycheck-python-mypy-executable "~/.pyenv/shims/mypy"
-        ;; flycheck-python-mypy-executable nil
-        flycheck-check-syntax-automatically '(idle-change mode-enabled)
+        flycheck-check-syntax-automatically '(save idle-change idle-buffer-switch new-line mode-enabled)
         flycheck-sh-shellcheck-executable "/usr/local/bin/shellcheck"))
 
 (use-package flymake
-  :disabled
   :ensure nil
-  :init
-  (setq-default flymake-no-changes-timeout 0.5))
+  :defer t
+  (setq python-flymake-command '("~/.pyenv/shims/flake8" "-")))
 
 (use-package tab-jump-out
   :defer t
@@ -5002,14 +4991,17 @@ with the scratch buffer."
 
   (general-define-key
    :keymaps 'elpy-mode-map
+   "C-j" 'elpy-shell-switch-to-shell
    "C-x m" 'elpy-multiedit
    "C-x ESC" 'elpy-multiedit-stop
    "C-c d" 'elpy-doc)
 
-  (defun my/elpy-switch-to-buffer ()
+  (defun my-elpy-switch-to-buffer ()
     (interactive)
     (elpy-shell-switch-to-buffer)
-    (quit-windows-on "*Python*")))
+    (quit-windows-on "*Python*"))
+
+  (elpy-enable +1))
 
 (use-package pyenv-mode
   :after pyenv
@@ -5020,10 +5012,11 @@ with the scratch buffer."
   :after python)
 
 (use-package python
-  :defer t
   :ensure nil
   :init
-  (add-hook 'python-mode-hook 'my/python-hooks)
+  (add-hook 'python-mode-hook 'my-python-hooks)
+  (add-hook 'inferior-python-mode-hook 'my-inferior-python-mode-hooks)
+
   ;; https://stackoverflow.com/a/6141681
   ;; (add-hook 'python-mode-hook
   ;;           (lambda ()
@@ -5037,7 +5030,24 @@ with the scratch buffer."
 
   (setq python-shell-completion-native-enable nil)
 
-  (defun my/python-hooks ()
+  (defun my-python-hooks ()
+    (interactive)
+    (flymake-mode -1)
+    (electric-operator-mode +1)
+    (flycheck-mode +1)
+    (rainbow-delimiters-mode +1)
+    (highlight-operators-mode +1)
+    (evil-swap-keys-swap-double-single-quotes)
+    (evil-swap-keys-swap-underscore-dash)
+    (evil-swap-keys-swap-colon-semicolon)
+    (smartparens-strict-mode +1)
+    (my-company-idle-one-prefix-one-quiet)
+    (highlight-numbers-mode +1)
+    (yafolding-mode +1)
+    (apheleia-mode +1)
+    (elpy-enable +1))
+
+  (defun my-inferior-python-mode-hooks ()
     (interactive)
     (electric-operator-mode +1)
     (flycheck-mode +1)
@@ -5045,14 +5055,11 @@ with the scratch buffer."
     (highlight-operators-mode +1)
     (evil-swap-keys-swap-double-single-quotes)
     (evil-swap-keys-swap-underscore-dash)
+    (evil-swap-keys-swap-colon-semicolon)
     (smartparens-strict-mode +1)
-    (my-company-idle-two-prefix-one-quiet)
-    (highlight-numbers-mode +1)
-    (elpy-enable +1)
-    (yafolding-mode +1)
-    (importmagic-mode +1)
-    ;; (flymake-mode +1)
-    (apheleia-mode +1))
+    (my-company-idle-one-prefix-one-quiet)
+    (company-mode +1)
+    (highlight-numbers-mode +1))
 
   (add-to-list 'company-backends 'company-jedi)
 
@@ -5070,28 +5077,41 @@ with the scratch buffer."
     (olivetti-mode +1)
     (setq-local olivetti-body-width 60))
 
-  (defun my/inferior-python-mode-hooks ()
+  (defun my-python-hooks ()
     (interactive)
-    (line-numbers)
     (subword-mode 1)
-    (electric-operator-mode)
-    (company-mode))
+    (electric-operator-mode +1)
+    (company-mode)
+    (flycheck-mode +1)
+    (rainbow-delimiters-mode +1)
+    (highlight-operators-mode +1)
+    (evil-swap-keys-swap-double-single-quotes)
+    (evil-swap-keys-swap-underscore-dash)
+    (evil-swap-keys-swap-colon-semicolon)
+    (smartparens-strict-mode +1)
+    (my-company-idle-one-prefix-one-quiet)
+    (highlight-numbers-mode +1)
+    (elpy-enable +1)
+    )
+
   ;; PYTHON KEYS ;;
   (general-define-key
    :keymaps 'inferior-python-mode-map
+   "C-j" 'elpy-shell-switch-to-buffer
    "M-e" 'counsel-shell-history
    "C-c j" 'my/evil-shell-bottom
    "C-c u" 'universal-argument
    "C-u" 'comint-kill-input
    "C-l" 'comint-clear-buffer
-   "C-;" 'my/elpy-switch-to-buffer
+   "C-;" 'my-elpy-switch-to-buffer
    "C-n" 'comint-next-input
    "C-p" 'comint-previous-input)
 
   (general-unbind 'inferior-python-mode-map
-    :with 'ignore
+    :with 'elpy-shell-switch-to-buffer
     [remap save-buffer]
-    [remap evil-normal-state])
+    [remap my-save-buffer]
+    [remap comint-next-prompt])
 
   (general-unbind 'python-mode-map
     :with 'elpy-folding-toggle-at-point

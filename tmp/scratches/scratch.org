@@ -1,4 +1,8 @@
 #+TITLE: Scratch
 
-* Test
+* STRT Test
+:LOGBOOK:
+- State "STRT"       from "TODO"       [2020-05-03 Sun 08:29]
+CLOCK: [2020-05-03 Sun 08:29]
+:END:
 <2020-05-02 Sat>

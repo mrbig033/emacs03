@@ -2,7 +2,15 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("FZF Commands"
+(("PCC Working With Files"
+ (filename . "~/Documents/Study/python/PCC.pdf")
+ (position . 1)
+ (page . 226)
+ (slice 0.1519434628975265 0.011335012594458438 0.8445229681978799 0.9546599496221663)
+ (size . fit-width)
+ (origin 0.0 . 0.2723253757736516)
+ (handler . pdf-view-bookmark-jump-handler))
+("FZF Commands"
  (filename . "~/.fzf/shell/key-bindings.bash")
  (front-context-string . "__fzf_cd__() {\n ")
  (rear-context-string . "%q' \"$dir\"\n# }\n\n")
@@ -17,7 +25,7 @@
  (handler . pdf-view-bookmark-jump-handler))
 ("org-capture-last-stored"
  (filename . "~/org/Agenda/agenda.org")
- (front-context-string . "** TODO Map pdf-")
+ (front-context-string . "** TODO Lookup s")
  (rear-context-string . "2020-05-02 Sat]\n")
- (position . 659))
+ (position . 448))
 )

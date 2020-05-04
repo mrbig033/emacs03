@@ -1,4 +1,4 @@
-# key: pp
+# key: pps
 # binding: C-c l
 # name: print simples
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil) (yas-after-exit-snippet-hook 'evil-insert-state))  
