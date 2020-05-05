@@ -470,7 +470,7 @@
    "C-c i" 'pbcopy
    "§" 'helm-resume
    "C-S-s" 'helm-resume
-   "C-s" 'helm-swoop-without-pre-input
+   "C-s" 'counsel-grep-or-swiper
    "C--" 'helm-swoop
    "C-c u" 'revert-buffer
    "M-'"    'delete-window
@@ -487,7 +487,6 @@
    "C-/"     'my-term-below
    "C-c F s" 'my-show-server
    "C-x P"   'hydra-python-mode/body
-   "C-c j"   'org-journal-new-entry
    "C-c ç"   'my-bash-shebang
    "C-c k"   'kill-buffer-and-window
    "C-9"     'evil-commentary-line)
@@ -1086,6 +1085,7 @@
 (use-package exec-path-from-shell
   :init
   (exec-path-from-shell-copy-env "PYENV_SHELL")
+  (exec-path-from-shell-copy-env "STUDY")
   :config
   (when (memq window-system '(mac ns x))
     (exec-path-from-shell-initialize)))
@@ -1101,7 +1101,7 @@
                             (gofmt "gofmt")
                             (terraform "terraform" "fmt" "-")))
 
-;; (apheleia-global-mode +1)
+(apheleia-global-mode +1)
 
 (use-package yequake)
 
@@ -1199,7 +1199,6 @@
                              "^init.org$"
                              "^agenda.org$"
                              "^pytasks.org$"
-                             "^sct.py$"
                              "*Racket REPL*"))
 
   ;; http://bit.ly/332kLj9
@@ -2292,6 +2291,7 @@ _n_: next sexp
   ("l" org-clock-in-last)
   ("c" org-clock-cancel)
   ("y" org-clock-display)
+  ("j" org-clock-display)
   ("m" org-mru-clock-in)
   ("e" org-set-effort)
   ("a" org-clock-modify-effort-estimate)
@@ -2777,7 +2777,8 @@ _n_: next sexp
         avy-background t
         avy-styles-alist '((avy-goto-line . at))
         avy-keys (nconc (number-sequence ?a ?z)
-                        (number-sequence ?0 ?9)))
+                        ;; (number-sequence ?0 ?9)
+                        ))
 
   (setq avy-all-windows nil)
 
@@ -3227,7 +3228,7 @@ with the scratch buffer."
 
   (setq auto-save-default nil
         super-save-idle-duration 2
-        super-save-auto-save-when-idle nil
+        super-save-auto-save-when-idle t
         auto-save-file-name-transforms `((".*" "~/emacs-profiles/my-emacs/var/temp" t)))
 
   (setq super-save-hook-triggers '(mouse-leave-buffer-hook focus-out-hook))
@@ -3830,8 +3831,8 @@ with the scratch buffer."
    "C-l"      nil
    "M-r"      'company-filter-candidates
    "RET"      nil
-   "<escape>" 'company-abort
-   ;; "<escape>" nil
+   ;; "<escape>" 'company-abort
+   "<escape>" nil
    "<tab>"    'my-company-yasnippet
    "C-h"      'delete-backward-char
 
@@ -4834,6 +4835,11 @@ with the scratch buffer."
     (save-buffer)
     (quickrun))
 
+  (defun my-python-quickrun ()
+    (interactive)
+    (save-buffer)
+    (quickrun))
+
   (general-unbind 'quickrun--mode-map
     :with 'my-quickrun-quit
     [remap my-quiet-save-buffer])
@@ -4990,6 +4996,7 @@ with the scratch buffer."
 
   (general-define-key
    :keymaps 'elpy-mode-map
+   "C-c j" 'elpy-shell-send-buffer-and-go
    "C-j" 'elpy-shell-switch-to-shell
    "C-x m" 'elpy-multiedit
    "C-x ESC" 'elpy-multiedit-stop

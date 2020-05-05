@@ -33,7 +33,7 @@
  (handler . pdf-view-bookmark-jump-handler))
 ("org-capture-last-stored"
  (filename . "~/org/Agenda/agenda.org")
- (front-context-string . "** TODO Lookup s")
+ (front-context-string . "** TODO Disable ")
  (rear-context-string . "2020-05-02 Sat]\n")
- (position . 448))
+ (position . 772))
 )
