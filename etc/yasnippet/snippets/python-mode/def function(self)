@@ -1,0 +1,6 @@
+# key: delf
+# name: def function(self)
+# --
+def ${1:funcname}(self$3):
+    $0
+    pass

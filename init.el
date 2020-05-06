@@ -75,7 +75,7 @@
       inhibit-startup-buffer-menu t
       initial-major-mode 'scratch-mode
       custom-file (concat udir ".emacs-custom.el")
-      default-frame-alist '((font . "Input Mono Light 18")))
+      default-frame-alist '((font . "Input Mono Light 19")))
 (setq parens-require-spaces nil)
 (blink-cursor-mode 0)
 
@@ -171,8 +171,8 @@
               ("gm"                . nil)
               ("z0"                . flyspell-correct-wrapper)
               ("C-k"               . my-kill-line)
-              ("F"                 . avy-goto-word-0-above)
-              ("f"                 . avy-goto-word-0-below)
+              ("F"                 . avy-goto-word-1-above)
+              ("f"                 . avy-goto-word-1-below)
               ("gf"                . evil-find-char)
               ("gF"                . evil-find-char-backward)
               ("C-."               . nil)
@@ -227,8 +227,8 @@
               ("\\"                . toggle-truncate-lines)
               ("Ç"                 . git-timemachine)
               ("z0"                . flyspell-correct-wrapper)
-              ("F"                 . avy-goto-word-0-above)
-              ("f"                 . avy-goto-word-0-below)
+              ("F"                 . avy-goto-word-1-above)
+              ("f"                 . avy-goto-word-1-below)
               ("."                 . counsel-org-capture)
               (","                 .  hydra-org-agenda/body)
               ("gx"                . evil-exchange)
@@ -1065,18 +1065,18 @@
   :after org
   :config
   (setq org-pomodoro-offset 1
+        org-pomodoro-start-sound-args t
         org-pomodoro-length (* 25 org-pomodoro-offset)
         org-pomodoro-long-break-length (* 20 org-pomodoro-offset)
         org-pomodoro-short-break-length (* 5 org-pomodoro-offset)
         org-pomodoro-long-break-frequency 4
-        org-pomodoro-ask-upon-killing t
+        org-pomodoro-ask-upon-killing nil
         org-pomodoro-manual-break t
         org-pomodoro-keep-killed-pomodoro-time t
         org-pomodoro-time-format "%.2m"
         org-pomodoro-short-break-format "SHORT: %s"
         org-pomodoro-long-break-format "LONG: %s"
-        org-pomodoro-format "P: %s"
-        ))
+        org-pomodoro-format "P: %s"))
 
 (use-package org-web-tools
   :disabled
@@ -1094,14 +1094,7 @@
   :disabled)
 
 (straight-use-package '(apheleia :host github :repo "raxod502/apheleia"))
-
-(setq apheleia-formatters '((black "black" "-")
-                            (brittany "brittany" file)
-                            (prettier npx "prettier" file)
-                            (gofmt "gofmt")
-                            (terraform "terraform" "fmt" "-")))
-
-(apheleia-global-mode +1)
+;; (apheleia-global-mode +1)
 
 (use-package yequake)
 
@@ -1151,6 +1144,7 @@
 
 (use-package beacon
   ;; :if window-system
+  :disabled
   :init (add-hook 'beacon-dont-blink-predicates
                   (lambda () (bound-and-true-p centered-cursor-mode)))
   :config
@@ -1657,10 +1651,10 @@
     ^
     ^Python^
     ^^^^^-------------------------------------------
-    _r_: run term    _c_: copy eror  _B_: pdb
-    _s_: quickshell  _d_: goto def   _a_: scratch
-    _P_: prev error  _b_: go back    _o_: doc
-    _n_: next error  _D_: docs       _RET_: flycheck
+    _r_: run term    _g_: goto dumb  _RET_: flycheck
+    _s_: quickshell  _d_: goto def
+    _P_: prev error  _a_: goto assig
+    _n_: next error  _b_: go back
 
 "
 
@@ -1671,21 +1665,12 @@
   ("s" quickrun-shell)
   ("P" flymake-goto-prev-error)
   ("n" flymake-goto-next-error)
-
-  ("c" flycheck-copy-errors-as-kill)
-
+  ("a" elpy-goto-assignment)
+  ("g" dumb-jump-go)
   ("d" elpy-goto-definition)
   ("b" pop-tag-mark)
   ("<C-return>" dumb-jump-back)
-
-  ("g" engine/search-python-3)
-  ("D" engine/search-python-3-docs)
-  ("B" my-pdb)
-  ("a" my-goto-python-scratch)
-  ("o" elpy-doc)
-  ("RET" hydra-flycheck-mode/body)
-
-  )
+  ("RET" hydra-flycheck-mode/body))
 
 (defhydra hydra-racket-mode (:color blue :hint nil :foreign-keys run)
   "
@@ -2130,8 +2115,8 @@ _n_: next sexp
 ^
   _e_: clean spaces  _l_: lorem par _v_: visible mode
   _i_: dup. par      _s_: lorem sen
-  _t_: truncate      _Y_: copy line
-  _d_: com & dup     _y_: move line
+  _t_: truncate      _y_: copy line
+  _d_: com & dup     _Y_: move line
 "
 
   ("<escape>" nil)
@@ -2144,8 +2129,8 @@ _n_: next sexp
 
   ("l" lorem-ipsum-insert-paragraphs)
   ("s" lorem-ipsum-insert-sentences)
-  ("y" avy-move-line)
-  ("Y" avy-copy-line)
+  ("Y" avy-move-line)
+  ("y" avy-copy-line)
   ("d" my-comm-dup-line)
   ("v" visible-mode))
 
@@ -3217,14 +3202,8 @@ with the scratch buffer."
   (setq which-key-idle-delay 0.5))
 
 (use-package super-save
-  ;; :disabled
   :config
-
-  ;; (setq super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
-  ;; (setq-default super-save-exclude '("\\.pdf" "\\.py" "+new-snippet+"))
-
-  (setq super-save-exclude '("pdf" "\\.pdf" "+new-snippet+"))
-  (setq-default super-save-exclude '("pdf" "\\.pdf" "+new-snippet+"))
+  (setq super-save-exclude '(".pdf" "+new-snippet+"))
 
   (setq auto-save-default nil
         super-save-idle-duration 2
@@ -3248,7 +3227,7 @@ with the scratch buffer."
           eyebrowse-prev-window-config))
 
   (auto-save-mode -1)
-  (super-save-mode +1))
+  (super-save-mode nil))
 
 (use-package wordnut
   ;; :if window-system
@@ -4649,6 +4628,7 @@ with the scratch buffer."
 (use-package flymake
   :ensure nil
   :defer t
+  :config
   (setq python-flymake-command '("~/.pyenv/shims/flake8" "-")))
 
 (use-package tab-jump-out
@@ -5026,6 +5006,11 @@ with the scratch buffer."
   ;; https://stackoverflow.com/a/6141681
   ;; (add-hook 'python-mode-hook
   ;;           (lambda ()
+  ;;             (add-hook 'evil-insert-state-exit-hook (lambda() (save-buffer)) nil t)))
+
+  ;; https://stackoverflow.com/a/6141681
+  ;; (add-hook 'python-mode-hook
+  ;;           (lambda ()
   ;;             (add-hook 'write-contents-functions (lambda() (elpy-black-fix-code)) nil t)))
 
   :config
@@ -5051,7 +5036,7 @@ with the scratch buffer."
     (my-company-idle-one-prefix-one-quiet)
     (highlight-numbers-mode +1)
     (yafolding-mode +1)
-    (apheleia-mode +1)
+    ;; (apheleia-mode +1)
     (importmagic-mode +1)
     (elpy-enable +1))
 
@@ -5069,7 +5054,7 @@ with the scratch buffer."
     (company-mode +1)
     (highlight-numbers-mode +1))
 
-  (add-to-list 'company-backends 'company-jedi)
+  ;; (add-to-list 'company-backends 'company-jedi)
 
   ;; (setq-local company-backends '(company-jedi
   ;;                                company-dabbrev-code
@@ -5089,7 +5074,7 @@ with the scratch buffer."
     (interactive)
     (subword-mode 1)
     (electric-operator-mode +1)
-    (company-mode)
+    (company-mode +1)
     (flycheck-mode +1)
     (rainbow-delimiters-mode +1)
     (highlight-operators-mode +1)
@@ -5131,7 +5116,7 @@ with the scratch buffer."
 
   (general-define-key
    :keymaps 'python-mode-map
-   "<M-return>" 'apheleia-format-buffer
+   "<M-return>" 'blacken-buffer
    "M-a" 'python-nav-backward-statement
    "M-e" 'python-nav-forward-statement
    "C-S-p" 'python-nav-backward-sexp
@@ -5153,7 +5138,13 @@ with the scratch buffer."
 
   (general-nmap
     :keymaps 'python-mode-map
-    "<escape>" 'my-prog-save-buffer)
+    "<escape>" 'my-python-save-buffer)
+
+  (defun my-python-save-buffer ()
+    (interactive)
+    (delete-trailing-whitespace)
+    (blacken-buffer)
+    (save-buffer))
 
   (general-nvmap
     :keymaps 'python-mode-map
@@ -5177,13 +5168,13 @@ with the scratch buffer."
     "gj" 'outline-forward-same-level
     "gk" 'outline-backward-same-level)
 
-  (defun my/python-newline-beg ()
+  (defun my-python-newline-beg ()
     (interactive)
     (evil-insert-state)
     (newline)
     (beginning-of-line))
 
-  (defun my/python-colon-newline ()
+  (defun my-python-colon-newline ()
     (interactive)
     (end-of-line)
     (insert ":")
@@ -5191,8 +5182,8 @@ with the scratch buffer."
 
   (general-imap
     :keymaps 'python-mode-map
-    "C-="   'my/python-colon-newline
-    "C-ç" 'my/python-newline-beg
+    "C-="   'my-python-colon-newline
+    "C-ç" 'my-python-newline-beg
     "<C-return>" 'my-quickrun
     "C-h" 'python-indent-dedent-line-backspace
     "M-a" 'python-nav-backward-statement
@@ -5273,13 +5264,6 @@ with the scratch buffer."
     (insert "#!/usr/bin/env python3\n\n")
     (evil-insert-state)
     (flycheck-clear))
-
-  (defun my/python-save-buffer ()
-    (interactive)
-    (evil-ex-nohighlight)
-    (let ((inhibit-message t))
-      (delete-trailing-whitespace)
-      (save-buffer)))
 
   ;; PYTHON SETTINGS
 
@@ -5369,6 +5353,7 @@ with the scratch buffer."
              (elmacro-mode " " "elmacro"))))
 
 (use-package dimmer
+  :disabled
   :config
   (setq dimmer-buffer-exclusion-regexps '("*LV*" "^ \\*Minibuf-[0-9]+\\*$" "^ \\*Echo.*\\*$")
         dimmer-fraction 0.2)
@@ -6657,7 +6642,7 @@ with the scratch buffer."
 (use-package warnings
   :ensure nil
   :config
-  (setq warning-minimum-level :emergency))
+  (setq warning-minimum-level :warning))
 
 (use-package custom
   :defer t
