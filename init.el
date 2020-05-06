@@ -1082,6 +1082,153 @@
   :disabled
   :after org)
 
+(use-package treemacs
+  :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+
+  (defun my/treemacs-hooks ()
+    (interactive)
+    (treemacs-resize-icons 16))
+  (add-hook 'treemacs-select-hook 'my/treemacs-hooks)
+  (add-hook 'treemacs-select-hook 'beacon-blink)
+  (add-hook 'treemacs-quit-hook 'beacon-blink)
+  (add-hook 'treemacs-mode-hook 'hide-mode-line-mode)
+
+  :config
+
+  (with-eval-after-load 'treemacs
+    (defun treemacs-ignore-gitignore (file _)
+      (string= file "__pycache__"))
+    (push #'treemacs-ignore-gitignore treemacs-ignored-file-predicates))
+
+  (progn
+    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay      0.5
+          treemacs-display-in-side-window        t
+          treemacs-eldoc-display                 nil
+          treemacs-file-event-delay              5000
+          treemacs-file-follow-delay             0.2
+          treemacs-follow-after-init             t
+          treemacs-git-command-pipe              ""
+          treemacs-goto-tag-strategy             'refetch-index
+          treemacs-indentation                   1
+          treemacs-indentation-string            " "
+          treemacs-is-never-other-window         t
+          treemacs-max-git-entries               5000
+          treemacs-missing-project-action        'ask
+          treemacs-no-png-images                 nil
+          treemacs-no-delete-other-windows       nil
+          treemacs-project-follow-cleanup        nil
+          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                      'left
+          treemacs-recenter-distance             0.1
+          treemacs-recenter-after-file-follow    nil
+          treemacs-recenter-after-tag-follow     nil
+          treemacs-recenter-after-project-jump   'always
+          treemacs-recenter-after-project-expand 'on-distance
+          treemacs-show-cursor                   nil
+          treemacs-show-hidden-files             nil
+          treemacs-silent-filewatch              nil
+          treemacs-silent-refresh                nil
+          treemacs-sorting                       'alphabetic-desc
+          treemacs-space-between-root-nodes      t
+          treemacs-tag-follow-cleanup            t
+          treemacs-tag-follow-delay              1.5
+          ;; treemacs-width                         35
+          treemacs-width                         15)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+;;;; FACES ;;;;
+  (custom-set-faces
+   '(treemacs-directory-collapsed-face ((t (:inherit treemacs-directory-face :weight normal :height 0.8))))
+   '(treemacs-directory-face ((t (:foreground "#f8f8f2" :height 0.80))))
+   '(treemacs-file-face ((t (:foreground "#f8f8f2" :height 0.80))))
+   '(treemacs-git-added-face ((t (:foreground "#50fa7b" :height 0.8 :width normal))))
+   '(treemacs-git-conflict-face ((t (:foreground "#ff5555" :height 0.8))))
+   '(treemacs-git-ignored-face ((t (:inherit font-lock-comment-face :height 0.8))))
+   '(treemacs-git-modified-face ((t (:foreground "#bd93f9" :height 0.8))))
+   '(treemacs-git-unmodified-face ((t (:inherit treemacs-file-face :height 0.8))))
+   '(treemacs-git-untracked-face ((t (:inherit font-lock-doc-face :height 0.8))))
+   '(treemacs-root-face ((t (:inherit font-lock-string-face :weight bold :height 0.80)))))
+
+  (general-unbind 'treemacs-mode-map
+    :with 'windmove-right
+    [remap minibuffer-keyboard-quit]
+    [remap treemacs-select-window])
+
+  (general-unbind 'treemacs-mode-map
+    :with 'ignore
+    [remap other-window]
+    [remap windmove-right]
+    [remap minibuffer-keyboard-quit])
+
+  (general-unbind 'treemacs-mode-map
+    :with 'treemacs-quit
+    [remap minibuffer-keyboard-quit])
+
+  (general-define-key
+   :keymaps 'treemacs-mode-map
+   "<insert>" 'treemacs-create-file
+   "ad" 'treemacs-remove-project-from-workspace
+   "ap" 'treemacs-add-project-to-workspace
+   "aP" 'treemacs-projectile
+   "D" 'treemacs-delete
+   "m" 'treemacs-RET-action
+   "<C-return>" 'my/treemacs-ret-quit)
+
+;;;; FUNCTIONS ;;;;
+
+  (defun my/treemacs-ret-quit ()
+    (interactive)
+    (treemacs-RET-action)
+    (delete-window (treemacs-get-local-window)))
+
+  ;;;; EYEBROWSE TREEMACS FUNCTION ;;;;
+  ;; https://github.com/Alexander-Miller/treemacs/issues/523#issuecomment-531552758
+  (defun treemacs--follow-after-eyebrowse-switch ()
+    (when treemacs-follow-mode
+      (--when-let (treemacs-get-local-window)
+        (with-selected-window it
+          (treemacs--follow-after-buffer-list-update)
+          (hl-line-highlight)))))
+
+  (add-hook 'eyebrowse-post-window-switch-hook #'treemacs--follow-after-eyebrowse-switch)
+  ;; https://github.com/Alexander-Miller/treemacs/issues/569#issuecomment-557266369
+  ;; (defun popup-treemacs ()
+  ;;   (save-selected-window
+  ;;     (treemacs-select-window)))
+  ;; (add-hook 'eyebrowse-post-window-switch-hook #'popup-treemacs)
+
+  :bind
+  (:map global-map
+        ("C-,"   . treemacs-select-window)))
+
+(use-package treemacs-evil
+  :after treemacs evil
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after treemacs projectile
+  :ensure t)
+
+(use-package treemacs-icons-dired
+  :after treemacs
+  :config (treemacs-icons-dired-mode))
+
+(use-package treemacs-magit
+  :after treemacs magit
+  :ensure t)
+
 (use-package exec-path-from-shell
   :init
   (exec-path-from-shell-copy-env "PYENV_SHELL")
