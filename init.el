@@ -289,7 +289,6 @@
    :keymaps 'evil-ex-search-keymap
    "C-s"    'previous-history-element)
 
-
   (general-unbind '(evil-normal-state-map
                     evil-insert-state-map
                     evil-visual-state-map)
@@ -1058,7 +1057,7 @@
            :default-categories ("sci-fi")
            :tags-as-categories nil))))
 
-(use-package org-pdfview
+(use-package org-pdftools
   :after org)
 
 (use-package org-pomodoro
@@ -1066,9 +1065,9 @@
   :config
   (setq org-pomodoro-offset 1
         org-pomodoro-start-sound-args t
-        org-pomodoro-length (* 25 org-pomodoro-offset)
-        org-pomodoro-long-break-length (* 20 org-pomodoro-offset)
-        org-pomodoro-short-break-length (* 5 org-pomodoro-offset)
+        org-pomodoro-length (* 35 org-pomodoro-offset)
+        org-pomodoro-short-break-length (/ org-pomodoro-length 5)
+        org-pomodoro-long-break-length (* org-pomodoro-length 0.8)
         org-pomodoro-long-break-frequency 4
         org-pomodoro-ask-upon-killing nil
         org-pomodoro-manual-break t
@@ -1083,7 +1082,7 @@
   :after org)
 
 (use-package treemacs
-  :defer t
+  :disabled
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
@@ -1214,22 +1213,27 @@
         ("C-,"   . treemacs-select-window)))
 
 (use-package treemacs-evil
-  :after treemacs evil
+  ;; :after treemacs evil
+  :disabled
   :ensure t)
 
 (use-package treemacs-projectile
-  :after treemacs projectile
+  ;; :after treemacs projectile
+  :disabled
   :ensure t)
 
 (use-package treemacs-icons-dired
+  :disabled
   :after treemacs
   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
-  :after treemacs magit
+  ;; :after treemacs magit
+  :disabled
   :ensure t)
 
 (use-package exec-path-from-shell
+  :disabled
   :init
   (exec-path-from-shell-copy-env "PYENV_SHELL")
   (exec-path-from-shell-copy-env "STUDY")
@@ -1239,9 +1243,6 @@
 
 (use-package which-key
   :disabled)
-
-(straight-use-package '(apheleia :host github :repo "raxod502/apheleia"))
-;; (apheleia-global-mode +1)
 
 (use-package yequake)
 
@@ -1253,13 +1254,13 @@
   (setq visible-bell nil))
 
 (use-package auto-package-update
+  :disabled
   :config
-  (setq auto-package-update-interval 14
+  (setq auto-package-update-interval 30
         auto-package-update-delete-old-versions t
-        auto-package-update-hide-results t
+        auto-package-update-hide-results nil
         auto-package-update-prompt-before-update t)
-  ;; (auto-package-update-maybe)
-  )
+  (auto-package-update-maybe))
 
 (define-derived-mode scratch-mode
   text-mode "scratch")
@@ -3024,13 +3025,13 @@ with the scratch buffer."
 
 (use-package targets
   :defer 5
-  :load-path "~/emacs-profiles/my-emacs/etc/custom_lisp"
+  :load-path "~/.emacs.d/etc/custom_lisp"
   :config
   (targets-setup t))
 
 (use-package i3wm-config-mode
   :defer nil
-  :load-path "~/emacs-profiles/my-emacs/etc/custom_lisp"
+  :load-path "~/.emacs.d/etc/custom_lisp"
   :init
   (add-hook 'i3wm-config-mode-hook 'my-prog-mode-hooks)
   :config
@@ -3039,7 +3040,7 @@ with the scratch buffer."
     "<backspace>" 'org-edit-src-exit))
 
 (use-package cool-moves
-  :load-path "~/emacs-profiles/my-emacs/etc/custom_lisp/cool-moves"
+  :load-path "~/.emacs.d/etc/custom_lisp/cool-moves"
   :config
   (general-define-key
    :keymaps 'override
@@ -3145,19 +3146,20 @@ with the scratch buffer."
 
 (use-package ranger
   :init
-  (add-hook 'ranger-mode-hook 'my-ranger-options)
-  (add-hook 'ranger-parent-dir-hook 'my-ranger-options-parent)
+  ;; (add-hook 'ranger-mode-hook 'my-ranger-options)
+  ;; (add-hook 'ranger-parent-dir-hook 'my-ranger-options-parent)
 
   (defun my-ranger-deer ()
     (interactive)
     (deer)
-    (olivetti-mode +1)
-    (olivetti-set-width 70))
+    (shut-up
+      (olivetti-mode +1)
+      (olivetti-set-width 70)))
 
   :bind (:map ranger-mode-map
               ("i"          . ranger-go)
               (";"          . evil-ex)
-              ("SPC"        . my-ranger-toggle-mark)
+              ;; ("SPC"        . my-ranger-toggle-mark)
               ("m"          . my-ranger-toggle-mark)
               ("tp"         . delete-file)
               ("<escape>"   . ranger-close)
@@ -3179,20 +3181,6 @@ with the scratch buffer."
               ;; ("<S-return>" . ranger-find-file-in-workspace)
               ("<S-return>" . my-dired-do-find-marked-files))
   :config
-
-  (general-define-key
-   :keymaps 'ranger-mode-map
-   :prefix "SPC"
-   "f" 'counsel-find-file
-   "SPC" 'my-ranger-toggle-mark
-   "q" 'ranger-close
-   "r" 'ranger-close
-   ";" 'evil-ex
-   "c" 'hydra-commands/body
-   "o" 'hydra-org-mode/body
-   "i" 'counsel-outline
-   "a" 'counsel-M-x
-   "b" 'my-evil-botright)
 
   (general-create-definer leader
     :prefix "SPC")
@@ -3353,9 +3341,9 @@ with the scratch buffer."
   (setq super-save-exclude '(".pdf" "+new-snippet+"))
 
   (setq auto-save-default nil
-        super-save-idle-duration 2
-        super-save-auto-save-when-idle t
-        auto-save-file-name-transforms `((".*" "~/emacs-profiles/my-emacs/var/temp" t)))
+        super-save-idle-duration 5
+        super-save-auto-save-when-idle nil
+        auto-save-file-name-transforms `((".*" "~/.emacs.d/var/temp" t)))
 
   (setq super-save-hook-triggers '(mouse-leave-buffer-hook focus-out-hook))
 
@@ -4329,6 +4317,7 @@ with the scratch buffer."
   :ensure t)
 
 (use-package company-tern
+  :disabled
   :after company
   :ensure t
   :config
@@ -4755,7 +4744,13 @@ with the scratch buffer."
 
 (use-package flycheck
   :ensure t
+  ;; :init
+  ;; (add-hook 'flycheck-mode-hook 'my-disable-python-mypy)
   :config
+
+  (defun my-disable-python-mypy ()
+    (interactive)
+    (flycheck-disable-checker 'python-mypy))
 
   (general-define-key
    :keymaps 'flycheck-mode-map
@@ -5088,85 +5083,53 @@ with the scratch buffer."
   "Simple mode for xmodmap files.")
 (add-to-list 'auto-mode-alist '("\\xmodmaps?\\'" . xmodmap-mode))
 
-(use-package elpy
-  :defer t
-  :init
-  (advice-add 'python-mode :before 'elpy-enable)
-  (add-hook 'elpy-mode-hook 'my/elpy-hooks)
-  :config
-  ;; (setq highlight-indentation-blank-lines 't)
-  (setq elpy-rpc-python-command "/Users/davi/.pyenv/shims/python")
-  (setq elpy-autodoc-delay 3)
-  (setq elpy-rpc-virtualenv-path 'current)
-
-  (general-unbind 'normal elpy-mode-map
-    :with 'yafolding-toggle-element
-    [remap elpy-folding-toggle-at-point])
-  (defun my/elpy-hooks ()
-    (interactive)
-    (my/disable-eldoc)
-    (pyenv-mode +1))
-
-  (defun my/disable-eldoc ()
-    (interactive)
-    (eldoc-mode -1))
-
-  (defun elpy-goto-definition ()
-    (interactive)
-    (elpy-rpc-warn-if-jedi-not-available)
-    (let ((location (elpy-rpc-get-definition)))
-      (if location
-          (elpy-goto-location (car location) (cadr location))
-        (error "No definition found")))
-    (save-excursion
-      (evil-scroll-line-to-center 1)))
-
-  (general-define-key
-   :keymaps 'elpy-mode-map
-   "C-c j" 'elpy-shell-send-buffer-and-go
-   "C-j" 'elpy-shell-switch-to-shell
-   "C-x m" 'elpy-multiedit
-   "C-x ESC" 'elpy-multiedit-stop
-   "C-c d" 'elpy-doc)
-
-  (defun my-elpy-switch-to-buffer ()
-    (interactive)
-    (elpy-shell-switch-to-buffer)
-    (quit-windows-on "*Python*"))
-
-  (elpy-enable +1))
-
-(use-package pyenv-mode
-  :after pyenv
-  :config
-  (pyenv-mode))
-
-(use-package jedi
-  :after python)
-
 (use-package python
   :ensure nil
   :init
   (add-hook 'python-mode-hook 'my-python-hooks)
   (add-hook 'inferior-python-mode-hook 'my-inferior-python-mode-hooks)
 
-  ;; https://stackoverflow.com/a/6141681
-  ;; (add-hook 'python-mode-hook
-  ;;           (lambda ()
-  ;;             (add-hook 'evil-insert-state-exit-hook (lambda() (save-buffer)) nil t)))
+  :bind (:map python-mode-map
+              ("<M-return>" . 'blacken-buffer)
+              ("M-a"        . 'python-nav-backward-statement)
+              ("M-e"        . 'python-nav-forward-statement)
+              ("C-S-p"      . 'python-nav-backward-sexp)
+              ("C-S-n"      . 'python-nav-forward-sexp)
+              ("C-x m"      . 'elpy-multiedit-python-symbol-at-point)
+              ("C-x M"      . 'elpy-multiedit-stop)
+              ("M-m"        . 'flycheck-first-error))
 
-  ;; https://stackoverflow.com/a/6141681
-  ;; (add-hook 'python-mode-hook
-  ;;           (lambda ()
-  ;;             (add-hook 'write-contents-functions (lambda() (elpy-black-fix-code)) nil t)))
+  :bind (:map inferior-python-mode-map
+              ("C-j"   . 'elpy-shell-switch-to-buffer)
+              ("M-e"   . 'counsel-shell-history)
+              ("C-c j" . 'my/evil-shell-bottom)
+              ("C-c u" . 'universal-argument)
+              ("C-u"   . 'comint-kill-input)
+              ("C-l"   . 'comint-clear-buffer)
+              ("C-;"   . 'my-elpy-switch-to-buffer)
+              ("C-n"   . 'comint-next-input)
+              ("C-p"   . 'comint-previous-input))
+
+  :custom
+  (comment-auto-fill-only-comments t)
+  (python-indent-offset 4)
+  (python-indent-guess-indent-offset nil)
+  (python-shell-interpreter-args "-i")
+  (python-shell-completion-native-enable nil)
 
   :config
-  (font-lock-add-keywords 'python-mode
-                          '(("cls" . font-lock-keyword-face)))
-  (setq python-shell-interpreter "python3")
-  (setq python-shell-interpreter-args "-i -q")
 
-  (setq python-shell-completion-native-enable nil)
+  (defun my-python-save-buffer ()
+    (interactive)
+    (delete-trailing-whitespace)
+    (blacken-buffer)
+    (save-buffer))
+
+  (defun my-python-colon-newline ()
+    (interactive)
+    (end-of-line)
+    (insert ":")
+    (newline-and-indent))
 
   (defun my-python-hooks ()
     (interactive)
@@ -5182,10 +5145,7 @@ with the scratch buffer."
     (smartparens-strict-mode +1)
     (my-company-idle-one-prefix-one-quiet)
     (highlight-numbers-mode +1)
-    (yafolding-mode +1)
-    ;; (apheleia-mode +1)
-    (importmagic-mode +1)
-    (elpy-enable +1))
+    (yafolding-mode +1))
 
   (defun my-inferior-python-mode-hooks ()
     (interactive)
@@ -5201,51 +5161,8 @@ with the scratch buffer."
     (company-mode +1)
     (highlight-numbers-mode +1))
 
-  ;; (add-to-list 'company-backends 'company-jedi)
-
-  ;; (setq-local company-backends '(company-jedi
-  ;;                                company-dabbrev-code
-  ;;                                company-files
-  ;;                                (company-semantic
-  ;;                                 company-capf
-  ;;                                 company-keywords
-  ;;                                 company-dabbrev
-  ;;                                 company-shell)))
-
-  (defun my/olivetti-narrow ()
-    (interactive)
-    (olivetti-mode +1)
-    (setq-local olivetti-body-width 60))
-
-  (defun my-python-hooks ()
-    (interactive)
-    (subword-mode 1)
-    (electric-operator-mode +1)
-    (company-mode +1)
-    (flycheck-mode +1)
-    (rainbow-delimiters-mode +1)
-    (highlight-operators-mode +1)
-    (evil-swap-keys-swap-double-single-quotes)
-    (evil-swap-keys-swap-underscore-dash)
-    (evil-swap-keys-swap-colon-semicolon)
-    (smartparens-strict-mode +1)
-    (my-company-idle-one-prefix-one-quiet)
-    (highlight-numbers-mode +1)
-    (elpy-enable +1)
-    )
-
-  ;; PYTHON KEYS ;;
-  (general-define-key
-   :keymaps 'inferior-python-mode-map
-   "C-j" 'elpy-shell-switch-to-buffer
-   "M-e" 'counsel-shell-history
-   "C-c j" 'my/evil-shell-bottom
-   "C-c u" 'universal-argument
-   "C-u" 'comint-kill-input
-   "C-l" 'comint-clear-buffer
-   "C-;" 'my-elpy-switch-to-buffer
-   "C-n" 'comint-next-input
-   "C-p" 'comint-previous-input)
+  (font-lock-add-keywords 'python-mode
+                          '(("cls" . font-lock-keyword-face)))
 
   (general-unbind 'inferior-python-mode-map
     :with 'elpy-shell-switch-to-buffer
@@ -5261,37 +5178,17 @@ with the scratch buffer."
     :with 'my-python-shebang
     [remap my-bash-shebang])
 
-  (general-define-key
-   :keymaps 'python-mode-map
-   "<M-return>" 'blacken-buffer
-   "M-a" 'python-nav-backward-statement
-   "M-e" 'python-nav-forward-statement
-   "C-S-p" 'python-nav-backward-sexp
-   "C-S-n" 'python-nav-forward-sexp
-   "C-x o" 'my/olivetti-narrow
-   "C-x m" 'elpy-multiedit-python-symbol-at-point
-   "C-x M" 'elpy-multiedit-stop
-   "C-c g" 'my/counsel-ag-python
-   "M-m" 'flycheck-first-error
-   "C-c p" 'my/python-make-print
-   "C-c f" 'my/python-make-fstring
-   "C-c DEL" 'my/erase-python-file
-   "C-c =" 'my/erase-python-file-and-yank
-   )
-
   (general-unbind 'python-mode-map
     :with 'yafolding-hide-all
     [remap evil-close-folds])
 
+  (general-unbind 'python-mode-map
+    :with 'elpy-doc
+    [remap helpful-at-point])
+
   (general-nmap
     :keymaps 'python-mode-map
-    "<escape>" 'my-python-save-buffer)
-
-  (defun my-python-save-buffer ()
-    (interactive)
-    (delete-trailing-whitespace)
-    (blacken-buffer)
-    (save-buffer))
+    "<escape>" 'my-save-buffer-only)
 
   (general-nvmap
     :keymaps 'python-mode-map
@@ -5315,18 +5212,6 @@ with the scratch buffer."
     "gj" 'outline-forward-same-level
     "gk" 'outline-backward-same-level)
 
-  (defun my-python-newline-beg ()
-    (interactive)
-    (evil-insert-state)
-    (newline)
-    (beginning-of-line))
-
-  (defun my-python-colon-newline ()
-    (interactive)
-    (end-of-line)
-    (insert ":")
-    (newline-and-indent))
-
   (general-imap
     :keymaps 'python-mode-map
     "C-="   'my-python-colon-newline
@@ -5336,124 +5221,47 @@ with the scratch buffer."
     "M-a" 'python-nav-backward-statement
     "M-e" 'python-nav-forward-statement
     "C-S-p" 'python-nav-backward-sexp
-    "C-S-n" 'python-nav-forward-sexp
-    )
+    "C-S-n" 'python-nav-forward-sexp))
 
-  ;; PYTHON FUNCTIONS;;
-
-  (defun execute-python-program ()
-    (interactive)
-    (my/window-to-register-91)
-    (my/quiet-save-buffer)
-    (defvar foo-execute-python)
-    (setq foo-execute-python (concat "python3 " (buffer-file-name)))
-    (other-window 1)
-    (switch-to-buffer-other-window "*Async Shell Command*")
-    (shell-command foo))
-
-  (defun my/execute-python-program-shell-simple  ()
-    (interactive)
-    (my/window-to-register-91)
-    (my/quiet-save-buffer)
-    (defvar foo-execute-python-simple)
-    (setq foo-execute-python-simple (concat "python3 " (prelude-copy-file-name-to-clipboard)))
-    (shell-command foo))
-
-  (defun my/ex-python-run ()
-    (interactive)
-    (evil-ex "w !python3"))
-
-  (defun my/execute-python-program-shell ()
-    (interactive)
-    (progn
-      (my/quiet-save-buffer)
-      (prelude-copy-file-name-to-clipboard)
-      (shell)
-      (sit-for 0.3)
-      (insert "source ~/scripts/cline_scripts/smallprompt.sh")
-      (comint-send-input)
-      (insert "python3 ")
-      (yank)
-      (comint-send-input)
-      (evil-insert-state)
-      (sit-for 0.3)
-      (comint-clear-buffer)
-      (company-mode -1)))
-
-  (general-unbind 'python-mode-map
-    :with 'elpy-doc
-    [remap helpful-at-point])
-
-  (defun my/run-python-external ()
-    (interactive)
-    (progn
-      (prelude-copy-file-name-to-clipboard)
-      (start-process-shell-command
-       "call term" nil
-       "~/scripts/i3_scripts/show_term_right")))
-
-  (defun my/erase-python-file ()
-    (interactive)
-    (erase-buffer)
-    (insert "#!/usr/bin/env python3\n\n")
-    (evil-insert-state)
-    (flycheck-clear))
-
-  (defun my/erase-python-file-and-yank ()
-    (interactive)
-    (erase-buffer)
-    (insert "#!/usr/bin/env python3\n\n")
-    (yank))
-
-  (defun my/kill-python-file ()
-    (interactive)
-    (kill-region (point-min) (point-max))
-    (insert "#!/usr/bin/env python3\n\n")
-    (evil-insert-state)
-    (flycheck-clear))
-
-  ;; PYTHON SETTINGS
-
-  (setq comment-auto-fill-only-comments t
-        python-indent-offset 4
-        python-indent-guess-indent-offset nil)
-
-  (auto-fill-mode 1))
-
-(use-package blacken
-  ;; :pin melpa-stable
+(use-package elpy
   :defer t
-  :config
-  (setq blacken-fast-unsafe nil)
-  (setq blacken-line-length 79))
+  :custom
+  (elpy-autodoc-delay 3)
+  (elpy-rpc-virtualenv-path 'current)
 
-(use-package importmagic
-  ;; :after python
-  :disabled
-  :config
-  (setq importmagic-python-interpreter "~/.pyenv/shims/python")
-  (setq importmagic-be-quiet t)
-  (remove-hook 'python-mode-hook 'importmagic-mode))
+  :bind (:map elpy-mode-map
+              ("C-c j"   . 'elpy-shell-send-buffer-and-go)
+              ("C-j"     . 'elpy-shell-switch-to-shell)
+              ("C-x m"   . 'elpy-multiedit)
+              ("C-x ESC" . 'elpy-multiedit-stop)
+              ("C-c d"   . 'elpy-doc))
 
-(use-package anaconda-mode
-  :disabled
+  :config
+
+  (general-unbind 'normal elpy-mode-map
+    :with 'yafolding-toggle-element
+    [remap elpy-folding-toggle-at-point])
+
+  (defun my-elpy-switch-to-buffer ()
+    (interactive)
+    (elpy-shell-switch-to-buffer)
+    (quit-windows-on "*Python*"))
+
+  (elpy-enable +1))
+
+(use-package jedi
   :after python)
 
 (use-package company-jedi
   :after python
-  :ensure t
   :config
   (add-to-list 'company-backends 'company-jedi))
 
-(use-package py-autopep8
-  :after python
-  :ensure t)
-
-(use-package live-py-mode
+(use-package blacken
   :defer t
-  :ensure t
-  :config
-  (setq live-py-update-all-delay 1))
+  :custom
+  (blacken-fast-unsafe nil)
+  (blacken-line-length 79))
 
 (use-package yafolding
   :defer t)
@@ -5797,7 +5605,7 @@ with the scratch buffer."
         buffer-save-without-query t
         backup-by-copying-when-linked t
         large-file-warning-threshold nil
-        backup-directory-alist '(("." . "~/emacs-profiles/my-emacs/var/backup"))
+        backup-directory-alist '(("." . "~/.emacs.d/var/backup"))
         find-file-suppress-same-file-warnings t)
 
   (setq auto-save-timeout 30)
@@ -6789,7 +6597,7 @@ with the scratch buffer."
 (use-package warnings
   :ensure nil
   :config
-  (setq warning-minimum-level :warning))
+  (setq warning-minimum-level :emergency))
 
 (use-package custom
   :defer t

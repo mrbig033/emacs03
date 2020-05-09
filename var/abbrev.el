@@ -650,7 +650,7 @@
 (define-abbrev-table 'snippet-mode-abbrev-table
   '(
     ("chs" "${1:$$(yas-choose-value '(\"option1\" \"option2\" \"option3\"))}" nil 2)
-    ("exp" "# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))" nil 6)
+    ("expand" "# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))" nil 6)
    ))
 
 (define-abbrev-table 'special-mode-abbrev-table '())

@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: pygame
+# binding: C-c p
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil)) 
+# --
+p.

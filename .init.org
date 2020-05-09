@@ -17022,3 +17022,22 @@ with the scratch buffer."
 #+BEGIN_SRC emacs-lisp
 (use-package poet-theme)
 #+END_SRC
+** 2020-05 May
+*** 2020-05-09 Saturday
+**** auto package update
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 10:49
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package auto-package-update
+  :disabled
+  :config
+  (setq auto-package-update-interval 30
+        auto-package-update-delete-old-versions t
+        auto-package-update-hide-results nil
+        auto-package-update-prompt-before-update t)
+  (auto-package-update-maybe))
+#+END_SRC

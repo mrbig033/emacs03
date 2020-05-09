@@ -4,7 +4,7 @@
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("org-capture-last-stored"
  (filename . "~/org/Agenda/agenda.org")
- (front-context-string . "** TODO Disable ")
- (rear-context-string . "2020-05-02 Sat]\n")
- (position . 772))
+ (front-context-string . "** TODO Hook on ")
+ (rear-context-string . "2020-05-05 Tue]\n")
+ (position . 823))
 )
