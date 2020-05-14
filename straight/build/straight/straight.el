@@ -1,0 +1,1 @@
+/Users/davi/.emacs.d/straight/repos/straight.el/straight.el

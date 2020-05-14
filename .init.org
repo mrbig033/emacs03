@@ -17041,3 +17041,844 @@ with the scratch buffer."
         auto-package-update-prompt-before-update t)
   (auto-package-update-maybe))
 #+END_SRC
+**** pyenv
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 13:55
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Prog/Python Main
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package pyenv-mode
+  :disabled
+  :init
+  (add-hook 'projectile-after-switch-project-hook 'projectile-pyenv-mode-set)
+  :config
+  (defun projectile-pyenv-mode-set ()
+    "Set pyenv version matching project name."
+    (let ((project (projectile-project-name)))
+      (if (member project (pyenv-mode-versions))
+          (pyenv-mode-set project)
+        (pyenv-mode-unset))))
+  (pyenv-mode +1))
+#+END_SRC
+**** importmagic
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 13:56
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Prog/Python Main
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package importmagic
+  ;; :after python
+  :disabled
+  :config
+  (setq importmagic-python-interpreter "~/.pyenv/shims/python")
+  (setq importmagic-be-quiet t)
+  (remove-hook 'python-mode-hook 'importmagic-mode))
+#+END_SRC
+**** anaconda-mode
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 13:56
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Prog/Python Main
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package anaconda-mode
+  :disabled
+  :after python)
+#+END_SRC
+**** py-autopep8
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 13:57
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Prog/Python
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package py-autopep8
+  :after python
+  :ensure t)
+#+END_SRC
+**** live-py-mode
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 13:57
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Prog/Python
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package live-py-mode
+  :defer t
+  :ensure t
+  :config
+  (setq live-py-update-all-delay 1))
+#+END_SRC
+**** apheleia
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 13:58
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Prog/Python
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+;; (straight-use-package '(apheleia :host github :repo "raxod502/apheleia"))
+;; (setf (alist-get 'black apheleia-formatters) '("black" "-l" "30" "-"))
+;; (apheleia-global-mode +1)
+#+END_SRC
+**** Treemacs
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:15
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+***** Treemacs Main
+#+BEGIN_SRC emacs-lisp
+(use-package treemacs
+  :disabled
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+
+  (defun my/treemacs-hooks ()
+    (interactive)
+    (treemacs-resize-icons 16))
+  (add-hook 'treemacs-select-hook 'my/treemacs-hooks)
+  (add-hook 'treemacs-select-hook 'beacon-blink)
+  (add-hook 'treemacs-quit-hook 'beacon-blink)
+  (add-hook 'treemacs-mode-hook 'hide-mode-line-mode)
+
+  :config
+
+  (with-eval-after-load 'treemacs
+    (defun treemacs-ignore-gitignore (file _)
+      (string= file "__pycache__"))
+    (push #'treemacs-ignore-gitignore treemacs-ignored-file-predicates))
+
+  (progn
+    (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay      0.5
+          treemacs-display-in-side-window        t
+          treemacs-eldoc-display                 nil
+          treemacs-file-event-delay              5000
+          treemacs-file-follow-delay             0.2
+          treemacs-follow-after-init             t
+          treemacs-git-command-pipe              ""
+          treemacs-goto-tag-strategy             'refetch-index
+          treemacs-indentation                   1
+          treemacs-indentation-string            " "
+          treemacs-is-never-other-window         t
+          treemacs-max-git-entries               5000
+          treemacs-missing-project-action        'ask
+          treemacs-no-png-images                 nil
+          treemacs-no-delete-other-windows       nil
+          treemacs-project-follow-cleanup        nil
+          treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
+          treemacs-position                      'left
+          treemacs-recenter-distance             0.1
+          treemacs-recenter-after-file-follow    nil
+          treemacs-recenter-after-tag-follow     nil
+          treemacs-recenter-after-project-jump   'always
+          treemacs-recenter-after-project-expand 'on-distance
+          treemacs-show-cursor                   nil
+          treemacs-show-hidden-files             nil
+          treemacs-silent-filewatch              nil
+          treemacs-silent-refresh                nil
+          treemacs-sorting                       'alphabetic-desc
+          treemacs-space-between-root-nodes      t
+          treemacs-tag-follow-cleanup            t
+          treemacs-tag-follow-delay              1.5
+          ;; treemacs-width                         35
+          treemacs-width                         15)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode t)
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple))))
+;;;; FACES ;;;;
+  (custom-set-faces
+   '(treemacs-directory-collapsed-face ((t (:inherit treemacs-directory-face :weight normal :height 0.8))))
+   '(treemacs-directory-face ((t (:foreground "#f8f8f2" :height 0.80))))
+   '(treemacs-file-face ((t (:foreground "#f8f8f2" :height 0.80))))
+   '(treemacs-git-added-face ((t (:foreground "#50fa7b" :height 0.8 :width normal))))
+   '(treemacs-git-conflict-face ((t (:foreground "#ff5555" :height 0.8))))
+   '(treemacs-git-ignored-face ((t (:inherit font-lock-comment-face :height 0.8))))
+   '(treemacs-git-modified-face ((t (:foreground "#bd93f9" :height 0.8))))
+   '(treemacs-git-unmodified-face ((t (:inherit treemacs-file-face :height 0.8))))
+   '(treemacs-git-untracked-face ((t (:inherit font-lock-doc-face :height 0.8))))
+   '(treemacs-root-face ((t (:inherit font-lock-string-face :weight bold :height 0.80)))))
+
+  (general-unbind 'treemacs-mode-map
+    :with 'windmove-right
+    [remap minibuffer-keyboard-quit]
+    [remap treemacs-select-window])
+
+  (general-unbind 'treemacs-mode-map
+    :with 'ignore
+    [remap other-window]
+    [remap windmove-right]
+    [remap minibuffer-keyboard-quit])
+
+  (general-unbind 'treemacs-mode-map
+    :with 'treemacs-quit
+    [remap minibuffer-keyboard-quit])
+
+  (general-define-key
+   :keymaps 'treemacs-mode-map
+   "<insert>" 'treemacs-create-file
+   "ad" 'treemacs-remove-project-from-workspace
+   "ap" 'treemacs-add-project-to-workspace
+   "aP" 'treemacs-projectile
+   "D" 'treemacs-delete
+   "m" 'treemacs-RET-action
+   "<C-return>" 'my/treemacs-ret-quit)
+
+;;;; FUNCTIONS ;;;;
+
+  (defun my/treemacs-ret-quit ()
+    (interactive)
+    (treemacs-RET-action)
+    (delete-window (treemacs-get-local-window)))
+
+  ;;;; EYEBROWSE TREEMACS FUNCTION ;;;;
+  ;; https://github.com/Alexander-Miller/treemacs/issues/523#issuecomment-531552758
+  (defun treemacs--follow-after-eyebrowse-switch ()
+    (when treemacs-follow-mode
+      (--when-let (treemacs-get-local-window)
+        (with-selected-window it
+          (treemacs--follow-after-buffer-list-update)
+          (hl-line-highlight)))))
+
+  (add-hook 'eyebrowse-post-window-switch-hook #'treemacs--follow-after-eyebrowse-switch)
+  ;; https://github.com/Alexander-Miller/treemacs/issues/569#issuecomment-557266369
+  ;; (defun popup-treemacs ()
+  ;;   (save-selected-window
+  ;;     (treemacs-select-window)))
+  ;; (add-hook 'eyebrowse-post-window-switch-hook #'popup-treemacs)
+
+  :bind
+  (:map global-map
+        ("C-,"   . treemacs-select-window)))
+#+END_SRC
+***** Treemacs Evil
+#+BEGIN_SRC emacs-lisp
+(use-package treemacs-evil
+  ;; :after treemacs evil
+  :disabled
+  :ensure t)
+#+END_SRC
+***** Treemacs Projectile
+#+BEGIN_SRC emacs-lisp
+(use-package treemacs-projectile
+  ;; :after treemacs projectile
+  :disabled
+  :ensure t)
+#+END_SRC
+***** Treemacs Icons Dired
+#+BEGIN_SRC emacs-lisp
+(use-package treemacs-icons-dired
+  :disabled
+  :after treemacs
+  :config (treemacs-icons-dired-mode))
+#+END_SRC
+***** Treemacs Magit
+#+BEGIN_SRC emacs-lisp
+(use-package treemacs-magit
+  ;; :after treemacs magit
+  :disabled
+  :ensure t)
+#+END_SRC
+**** which-key
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:15
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :disabled)
+#+END_SRC
+**** auto package update
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:16
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package auto-package-update
+  :disabled
+  :config
+  (setq auto-package-update-interval 30
+        auto-package-update-delete-old-versions t
+        auto-package-update-hide-results nil
+        auto-package-update-prompt-before-update t)
+  (auto-package-update-maybe))
+#+END_SRC
+**** Restart Emacs
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:16
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package restart-emacs
+  :config
+  (setq restart-emacs-restore-frames nil))
+#+END_SRC
+**** Beacon
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:16
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package beacon
+  ;; :if window-system
+  :disabled
+  :init (add-hook 'beacon-dont-blink-predicates
+                  (lambda () (bound-and-true-p centered-cursor-mode)))
+  :config
+  (setq beacon-dont-blink-commands '(next-line
+                                     org-edit-special
+                                     org-edit-src-exit
+                                     evil-forward-word-begin
+                                     evil-backward-word-begin
+                                     beginning-of-visual-line
+                                     evil-goto-first-line
+                                     evil-goto-line
+                                     evil-end-of-visual-line
+                                     end-of-visual-line
+                                     evil-indent
+                                     previous-line
+                                     forward-line
+                                     find-packs
+                                     find-keys
+                                     find-misc
+                                     helpful-at-point
+                                     quit-window
+                                     find-functions
+                                     find-macros
+                                     evil-scroll-page-up
+                                     evil-scroll-page-down
+                                     find-hydras
+                                     find-file
+                                     counsel-find-file
+                                     scroll-up-command
+                                     scroll-down-command
+                                     last-buffer))
+  (setq beacon-size 30
+        beacon-blink-delay 0.1
+        beacon-blink-duration 0.06
+        beacon-blink-when-focused nil
+        beacon-blink-when-window-scrolls t
+        beacon-blink-when-window-changes t
+        beacon-blink-when-point-moves-vertically nil
+        beacon-blink-when-point-moves-horizontally nil)
+  (beacon-mode +1))
+#+END_SRC
+**** VLF
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:17
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package vlf
+  :disabled
+  :ensure t
+  :init
+  (add-hook 'vlf-mode-hook 'my-vlf-hooks)
+  :config
+
+  (setq vlf-save-in-place t)
+
+  (defun my-vlf-hooks ()
+    (interactive)
+    (font-lock-mode -1)
+    (setq-local super-save-mode nil))
+
+  (setq vlf-tune-enabled nil
+        vlf-application 'dont-ask)
+
+  (require 'vlf-setup))
+#+END_SRC
+**** Helm
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:18
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+***** Helm Main
+#+BEGIN_SRC emacs-lisp
+(use-package helm
+  ;; :disabled
+  :init
+  (add-hook 'helm-occur-mode-hook 'previous-history-element)
+  :config
+  (setq helm-split-window-default-side 'same
+        helm-full-frame t)
+  ;; (helm-autoresize-mode +1)
+
+  (general-define-key
+   :keymaps   'helm-map
+   "<insert>" 'yank
+   "C-s"      'previous-history-element
+   "C-w"      'backward-kill-word))
+#+END_SRC
+***** Helm Org
+#+BEGIN_SRC emacs-lisp
+(use-package helm-org
+  ;; :after helm org
+  :disabled
+  :config
+
+  (defun my/helm-org-in-buffer-headings ()
+    (interactive)
+    (widen)
+    (helm-org-in-buffer-headings)
+    (org-narrow-to-subtree)))
+#+END_SRC
+***** Helm Org Rifle
+#+BEGIN_SRC emacs-lisp
+(use-package helm-org-rifle
+  ;; :after helm org
+  :disabled)
+#+END_SRC
+***** Helm Swoop
+#+BEGIN_SRC emacs-lisp
+(use-package helm-swoop
+  :after helm
+  :config
+  (general-define-key
+   :keymaps  'helm-swoop-map
+   "C-c i"     'helm-swoop-yank-thing-at-point
+   "C-w"     'backward-kill-word))
+  #+END_SRC
+
+**** Hercules
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:18
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package hercules
+  :disabled
+  :config
+
+  (hercules-def
+   :toggle-funs #'org-babel-mode
+   :keymap 'org-babel-map
+   :transient t)
+
+  (general-define-key
+   :keymaps 'org-mode-map
+   :states '(normal visual insert)
+   "C-x C-v" #'org-babel-mode)
+
+  (hercules-def
+   :toggle-funs #'racket
+   :keymap 'racket-mode-map
+   :transient t)
+
+  (general-define-key
+   :keymaps 'racket-mode-map
+   :states '(normal visual insert)
+   "C-ç" #'racket)
+
+  (hercules-def
+   :toggle-funs #'lispyville
+   :keymap 'lispyville-mode-map
+   :transient t)
+
+  (general-define-key
+   :keymaps 'lispyville-mode-map
+   :states '(normal visual insert)
+   "C--" #'lispyville))
+#+END_SRC
+**** dimmer
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:18
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Appearance
+:ARCHIVE_CATEGORY: init
+:END:
+ #+BEGIN_SRC emacs-lisp
+(use-package dimmer
+  :disabled
+  :config
+  (setq dimmer-buffer-exclusion-regexps '("*LV*" "^ \\*Minibuf-[0-9]+\\*$" "^ \\*Echo.*\\*$")
+        dimmer-fraction 0.2)
+  (dimmer-mode +1))
+ #+END_SRC
+**** telephone line
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:19
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Appearance/mode-line
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package telephone-line
+  :disabled
+  :config
+  (telephone-line-mode +1))
+#+END_SRC
+**** smart-mode-line
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:19
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Appearance/mode-line
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package smart-mode-line
+  :disabled
+  :config
+  (setq sml/no-confirm-load-theme t)
+  (sml/setup))
+#+END_SRC
+**** dracula
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-09 Sat 15:19
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Appearance/themes
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package dracula-theme
+  :disabled
+  :config
+  (setq dracula-enlarge-headings nil)
+  (load-theme 'dracula t))
+#+END_SRC
+*** 2020-05-14 Thursday
+**** agg fil par
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-14 Thu 03:42
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Text Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package aggressive-fill-paragraph
+  :disabled)
+#+END_SRC
+**** typo
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-14 Thu 03:43
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Text Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package typo
+  :defer t
+  :config
+  (defun typo-insert-cycle (cycle)
+    "Insert the strings in CYCLE"
+    (let ((i 0)
+          (repeat-key last-input-event)
+          repeat-key-str)
+      (insert (nth i cycle))
+      (setq repeat-key-str (format-kbd-macro (vector repeat-key) nil))
+      (while repeat-key
+        (message "(inserted %s)"
+                 (typo-char-name (nth i cycle))
+                 repeat-key-str)
+        (if (equal repeat-key (read-event))
+            (progn
+              (clear-this-command-keys t)
+              (delete-char (- (length (nth i cycle))))
+              (setq i (% (+ i 1)
+                         (length cycle)))
+              (insert (nth i cycle))
+              (setq last-input-event nil))
+          (setq repeat-key nil)))
+      (when last-input-event
+        (clear-this-command-keys t)
+        (setq unread-command-events (list last-input-event)))))
+
+
+  (define-typo-cycle typo-cycle-dashes
+    "Cycle through various dashes."
+    ("—"   ; EM DASHH
+     "-"   ; HYPHEN-MINUS
+     "–"   ; EN DASH
+     "−"   ; MINUS SIGN
+     "‐"   ; HYPHEN
+     "‑")) ; NON-BREAKING HYPHEN
+  (setq typo-language "brasileiro"))
+#+END_SRC
+**** My Write Modes
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-14 Thu 03:43
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Text Utils
+:ARCHIVE_CATEGORY: init
+:END:
+***** My Insert Mode
+#+BEGIN_SRC emacs-lisp
+(defun my-write-insert-mode ()
+  (interactive)
+  (general-unbind '(org-mode-map evil-org-mode-map)
+    :with 'ignore
+    ;; [remap evil-delete-backward-word]
+    [remap undo-fu-only-redo]
+    [remap undo-fu-only-undo]
+    [remap evil-org-open-below]
+    [remap evil-org-open-above]
+    [remap delete-backward-char]
+    [remap delete-char]
+    [remap evil-change-line]
+    [remap evil-change-to-initial-state]
+    [remap evil-change-to-previous-state]
+    [remap evil-change-whole-line]
+    [remap evil-change]
+    [remap evil-delete-backward-char-and-join]
+    [remap evil-delete-backward-char]
+    [remap evil-delete-buffer]
+    [remap evil-delete-char]
+    [remap evil-delete-line]
+    [remap evil-delete-marks]
+    [remap evil-delete-whole-line]
+    [remap evil-delete]
+    [remap evil-join-space]
+    [remap evil-join]
+    [remap evil-org-delete-backward-char]
+    [remap evil-org-delete-char]
+    [remap evil-org-delete]
+    [remap kill-line]
+    [remap kill-paragraph]
+    [remap kill-rectangle]
+    [remap kill-region]
+    [remap kill-ring-save]
+    [remap kill-sentence]
+    [remap kill-visual-line]
+    [remap kill-whole-line]
+    [remap kill-word]
+    [remap my/backward-kill-line]
+    [remap org-delete-backward-char]
+    [remap org-delete-char]
+    [remap org-delete-indentation]
+    [remap org-delete-property-globally]
+    [remap org-delete-property]
+    [remap undo])
+  (evil-define-key 'insert org-mode-map (kbd "C-k") 'ignore)
+  (evil-define-key 'insert org-mode-map (kbd "DEL") 'ignore)
+  (message " insert only"))
+#+END_SRC
+***** My Edit Mode
+#+BEGIN_SRC emacs-lisp
+(defun my-write-edit-mode ()
+  (interactive)
+  (general-unbind '(org-mode-map evil-org-mode-map)
+    :with nil
+    [remap undo-fu-only-redo]
+    [remap undo-fu-only-undo]
+    [remap evil-delete-backward-word]
+    [remap evil-org-open-below]
+    [remap evil-org-open-above]
+    [remap delete-backward-char]
+    [remap delete-char]
+    [remap evil-change-line]
+    [remap evil-change-to-initial-state]
+    [remap evil-change-to-previous-state]
+    [remap evil-change-whole-line]
+    [remap evil-change]
+    [remap evil-delete-backward-char-and-join]
+    [remap evil-delete-backward-char]
+    [remap evil-delete-buffer]
+    [remap evil-delete-char]
+    [remap evil-delete-line]
+    [remap evil-delete-marks]
+    [remap evil-delete-whole-line]
+    [remap evil-delete]
+    [remap evil-join-space]
+    [remap evil-join]
+    [remap evil-org-delete-backward-char]
+    [remap evil-org-delete-char]
+    [remap evil-org-delete]
+    [remap kill-line]
+    [remap kill-paragraph]
+    [remap kill-rectangle]
+    [remap kill-region]
+    [remap kill-ring-save]
+    [remap kill-sentence]
+    [remap kill-visual-line]
+    [remap kill-whole-line]
+    [remap kill-word]
+    [remap my/backward-kill-line]
+    [remap org-delete-backward-char]
+    [remap org-delete-char]
+    [remap org-delete-indentation]
+    [remap org-delete-property-globally]
+    [remap org-delete-property]
+    [remap undo])
+  (evil-define-key 'insert org-mode-map (kbd "C-k") 'kill-visual-line)
+  (evil-define-key 'insert org-mode-map (kbd "DEL") 'evil-delete-backward-char-and-join)
+  (message " insert and edit"))
+#+END_SRC
+**** My Write Modes
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-14 Thu 03:43
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Text Utils
+:ARCHIVE_CATEGORY: init
+:END:
+***** My Insert Mode
+#+BEGIN_SRC emacs-lisp
+(defun my-write-insert-mode ()
+  (interactive)
+  (general-unbind '(org-mode-map evil-org-mode-map)
+    :with 'ignore
+    ;; [remap evil-delete-backward-word]
+    [remap undo-fu-only-redo]
+    [remap undo-fu-only-undo]
+    [remap evil-org-open-below]
+    [remap evil-org-open-above]
+    [remap delete-backward-char]
+    [remap delete-char]
+    [remap evil-change-line]
+    [remap evil-change-to-initial-state]
+    [remap evil-change-to-previous-state]
+    [remap evil-change-whole-line]
+    [remap evil-change]
+    [remap evil-delete-backward-char-and-join]
+    [remap evil-delete-backward-char]
+    [remap evil-delete-buffer]
+    [remap evil-delete-char]
+    [remap evil-delete-line]
+    [remap evil-delete-marks]
+    [remap evil-delete-whole-line]
+    [remap evil-delete]
+    [remap evil-join-space]
+    [remap evil-join]
+    [remap evil-org-delete-backward-char]
+    [remap evil-org-delete-char]
+    [remap evil-org-delete]
+    [remap kill-line]
+    [remap kill-paragraph]
+    [remap kill-rectangle]
+    [remap kill-region]
+    [remap kill-ring-save]
+    [remap kill-sentence]
+    [remap kill-visual-line]
+    [remap kill-whole-line]
+    [remap kill-word]
+    [remap my/backward-kill-line]
+    [remap org-delete-backward-char]
+    [remap org-delete-char]
+    [remap org-delete-indentation]
+    [remap org-delete-property-globally]
+    [remap org-delete-property]
+    [remap undo])
+  (evil-define-key 'insert org-mode-map (kbd "C-k") 'ignore)
+  (evil-define-key 'insert org-mode-map (kbd "DEL") 'ignore)
+  (message " insert only"))
+#+END_SRC
+***** My Edit Mode
+#+BEGIN_SRC emacs-lisp
+(defun my-write-edit-mode ()
+  (interactive)
+  (general-unbind '(org-mode-map evil-org-mode-map)
+    :with nil
+    [remap undo-fu-only-redo]
+    [remap undo-fu-only-undo]
+    [remap evil-delete-backward-word]
+    [remap evil-org-open-below]
+    [remap evil-org-open-above]
+    [remap delete-backward-char]
+    [remap delete-char]
+    [remap evil-change-line]
+    [remap evil-change-to-initial-state]
+    [remap evil-change-to-previous-state]
+    [remap evil-change-whole-line]
+    [remap evil-change]
+    [remap evil-delete-backward-char-and-join]
+    [remap evil-delete-backward-char]
+    [remap evil-delete-buffer]
+    [remap evil-delete-char]
+    [remap evil-delete-line]
+    [remap evil-delete-marks]
+    [remap evil-delete-whole-line]
+    [remap evil-delete]
+    [remap evil-join-space]
+    [remap evil-join]
+    [remap evil-org-delete-backward-char]
+    [remap evil-org-delete-char]
+    [remap evil-org-delete]
+    [remap kill-line]
+    [remap kill-paragraph]
+    [remap kill-rectangle]
+    [remap kill-region]
+    [remap kill-ring-save]
+    [remap kill-sentence]
+    [remap kill-visual-line]
+    [remap kill-whole-line]
+    [remap kill-word]
+    [remap my/backward-kill-line]
+    [remap org-delete-backward-char]
+    [remap org-delete-char]
+    [remap org-delete-indentation]
+    [remap org-delete-property-globally]
+    [remap org-delete-property]
+    [remap undo])
+  (evil-define-key 'insert org-mode-map (kbd "C-k") 'kill-visual-line)
+  (evil-define-key 'insert org-mode-map (kbd "DEL") 'evil-delete-backward-char-and-join)
+  (message " insert and edit"))
+#+END_SRC
+**** Clipmon
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-14 Thu 03:43
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package clipmon
+  :defer nil
+  :config
+  ;; https://github.com/bburns/clipmon/issues/11
+  (setq clipmon-transform-trim nil)
+  (setq selection-coding-system 'utf-8-unix)
+  (clipmon-mode +1))
+#+END_SRC
+**** origami
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-14 Thu 03:43
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Utils/Prog
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package origami
+  :disabled)
+#+END_SRC
+**** safe-term
+:PROPERTIES:
+:ARCHIVE_TIME: 2020-05-14 Thu 03:53
+:ARCHIVE_FILE: ~/.emacs.d/init.org
+:ARCHIVE_OLPATH: Builtins/N3
+:ARCHIVE_CATEGORY: init
+:END:
+#+BEGIN_SRC emacs-lisp
+(use-package sane-term
+  :bind (("C-x t" . nil)
+         ("C-x T" . nil)))
+#+END_SRC

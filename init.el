@@ -144,8 +144,7 @@
   :bind (:map evil-normal-state-map
               ("z=" . endless/ispell-word-then-abbrev)
               ("ç" . insert-char)
-              ;; ("=" . evil-indent)
-              ;; ("C--" . kill-whole-line)
+              (";"   . hydra-projectile-mode/body)
               ("gh" . org-up-element)
               ("gl" . org-down-element)
               ("gM" . evil-set-marker)
@@ -156,7 +155,6 @@
               ("zb" . evil-scroll-line-to-bottom)
               ("C-r" . undo-fu-only-redo)
               ("<mouse-2>" . my-kill-this-buffer)
-              ;; ("M-i"               . delete-frame)
               ("M-o"               . evil-jump-backward)
               ("M-i"               . evil-jump-forward)
               ("Q"                 . delete-frame)
@@ -180,7 +178,6 @@
               (","                 .  hydra-org-agenda/body)
               ("gx"                . evil-exchange)
               ("gX"                . evil-exchange-cancel)
-              (";"                 . evil-ex)
               ("<XF86Explorer>"  . quick-calc)
               ("K"                 . ignore)
               ("'"                 . evil-goto-mark)
@@ -206,6 +203,7 @@
               ("C-a"                 . evil-numbers/inc-at-pt))
 
   :bind (:map evil-visual-state-map
+              (";"   . hydra-projectile-mode/body)
               ("ç" . insert-char)
               ("K"                 . ignore)
               ("g3"                . evil-backward-word-end)
@@ -470,7 +468,6 @@
    "§" 'helm-resume
    "C-S-s" 'helm-resume
    "C-s" 'counsel-grep-or-swiper
-   "C--" 'helm-swoop
    "C-c u" 'revert-buffer
    "M-'"    'delete-window
    "M-r" 'ivy-switch-buffer
@@ -478,7 +475,6 @@
    "M-s" 'last-buffer
    "C-x s" 'my-shell-below
    "M-ç" 'insert-char
-   "C-0"     'evil-execute-macro
    "C-c 0"     'evil-execute-macro
    "M-y" 'my-yank-pop
    "C-,"     'evil-window-prev
@@ -993,9 +989,8 @@
                               ("\\.jpg\\'" . "viewnior %s")
                               ("\\.mp4\\'" . "vlc %s")
                               ("\\.webm\\'" . "vlc %s")
-                              ("\\.pdf\\'" . "zathura %s")
+                              ;; ("\\.pdf\\'" . "zathura %s")
                               ("\\.epub\\'" . "ebook-viewer %s")
-                              ;; ("\\.pdf\\'" . "org-pdfview-open %s")
                               )))
   (add-to-list 'org-src-lang-modes '("i3" . i3wm-config))
 
@@ -1065,7 +1060,7 @@
   :config
   (setq org-pomodoro-offset 1
         org-pomodoro-start-sound-args t
-        org-pomodoro-length (* 35 org-pomodoro-offset)
+        org-pomodoro-length (* 25 org-pomodoro-offset)
         org-pomodoro-short-break-length (/ org-pomodoro-length 5)
         org-pomodoro-long-break-length (* org-pomodoro-length 0.8)
         org-pomodoro-long-break-frequency 4
@@ -1082,43 +1077,33 @@
   :after org)
 
 (use-package treemacs
-  :disabled
+  :defer t
   :init
   (with-eval-after-load 'winum
-    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-
-  (defun my/treemacs-hooks ()
-    (interactive)
-    (treemacs-resize-icons 16))
-  (add-hook 'treemacs-select-hook 'my/treemacs-hooks)
-  (add-hook 'treemacs-select-hook 'beacon-blink)
-  (add-hook 'treemacs-quit-hook 'beacon-blink)
-  (add-hook 'treemacs-mode-hook 'hide-mode-line-mode)
+    (define-key winum-keymap (kbd "C-0") #'treemacs-select-window))
 
   :config
-
-  (with-eval-after-load 'treemacs
-    (defun treemacs-ignore-gitignore (file _)
-      (string= file "__pycache__"))
-    (push #'treemacs-ignore-gitignore treemacs-ignored-file-predicates))
-
   (progn
     (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
           treemacs-deferred-git-apply-delay      0.5
+          treemacs-directory-name-transformer    #'identity
           treemacs-display-in-side-window        t
-          treemacs-eldoc-display                 nil
+          treemacs-eldoc-display                 t
           treemacs-file-event-delay              5000
+          treemacs-file-extension-regex          treemacs-last-period-regex-value
           treemacs-file-follow-delay             0.2
+          treemacs-file-name-transformer         #'identity
           treemacs-follow-after-init             t
           treemacs-git-command-pipe              ""
           treemacs-goto-tag-strategy             'refetch-index
-          treemacs-indentation                   1
+          treemacs-indentation                   2
           treemacs-indentation-string            " "
-          treemacs-is-never-other-window         t
+          treemacs-is-never-other-window         nil
           treemacs-max-git-entries               5000
           treemacs-missing-project-action        'ask
+          treemacs-move-forward-on-expand        nil
           treemacs-no-png-images                 nil
-          treemacs-no-delete-other-windows       nil
+          treemacs-no-delete-other-windows       t
           treemacs-project-follow-cleanup        nil
           treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
           treemacs-position                      'left
@@ -1128,15 +1113,20 @@
           treemacs-recenter-after-project-jump   'always
           treemacs-recenter-after-project-expand 'on-distance
           treemacs-show-cursor                   nil
-          treemacs-show-hidden-files             nil
+          treemacs-show-hidden-files             t
           treemacs-silent-filewatch              nil
           treemacs-silent-refresh                nil
-          treemacs-sorting                       'alphabetic-desc
+          treemacs-sorting                       'alphabetic-asc
           treemacs-space-between-root-nodes      t
           treemacs-tag-follow-cleanup            t
           treemacs-tag-follow-delay              1.5
-          ;; treemacs-width                         35
-          treemacs-width                         15)
+          treemacs-user-mode-line-format         nil
+          treemacs-user-header-line-format       nil
+          treemacs-width                         35)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
 
     (treemacs-follow-mode t)
     (treemacs-filewatch-mode t)
@@ -1147,120 +1137,40 @@
        (treemacs-git-mode 'deferred))
       (`(t . _)
        (treemacs-git-mode 'simple))))
-;;;; FACES ;;;;
-  (custom-set-faces
-   '(treemacs-directory-collapsed-face ((t (:inherit treemacs-directory-face :weight normal :height 0.8))))
-   '(treemacs-directory-face ((t (:foreground "#f8f8f2" :height 0.80))))
-   '(treemacs-file-face ((t (:foreground "#f8f8f2" :height 0.80))))
-   '(treemacs-git-added-face ((t (:foreground "#50fa7b" :height 0.8 :width normal))))
-   '(treemacs-git-conflict-face ((t (:foreground "#ff5555" :height 0.8))))
-   '(treemacs-git-ignored-face ((t (:inherit font-lock-comment-face :height 0.8))))
-   '(treemacs-git-modified-face ((t (:foreground "#bd93f9" :height 0.8))))
-   '(treemacs-git-unmodified-face ((t (:inherit treemacs-file-face :height 0.8))))
-   '(treemacs-git-untracked-face ((t (:inherit font-lock-doc-face :height 0.8))))
-   '(treemacs-root-face ((t (:inherit font-lock-string-face :weight bold :height 0.80)))))
-
-  (general-unbind 'treemacs-mode-map
-    :with 'windmove-right
-    [remap minibuffer-keyboard-quit]
-    [remap treemacs-select-window])
-
-  (general-unbind 'treemacs-mode-map
-    :with 'ignore
-    [remap other-window]
-    [remap windmove-right]
-    [remap minibuffer-keyboard-quit])
-
-  (general-unbind 'treemacs-mode-map
-    :with 'treemacs-quit
-    [remap minibuffer-keyboard-quit])
-
-  (general-define-key
-   :keymaps 'treemacs-mode-map
-   "<insert>" 'treemacs-create-file
-   "ad" 'treemacs-remove-project-from-workspace
-   "ap" 'treemacs-add-project-to-workspace
-   "aP" 'treemacs-projectile
-   "D" 'treemacs-delete
-   "m" 'treemacs-RET-action
-   "<C-return>" 'my/treemacs-ret-quit)
-
-;;;; FUNCTIONS ;;;;
-
-  (defun my/treemacs-ret-quit ()
-    (interactive)
-    (treemacs-RET-action)
-    (delete-window (treemacs-get-local-window)))
-
-  ;;;; EYEBROWSE TREEMACS FUNCTION ;;;;
-  ;; https://github.com/Alexander-Miller/treemacs/issues/523#issuecomment-531552758
-  (defun treemacs--follow-after-eyebrowse-switch ()
-    (when treemacs-follow-mode
-      (--when-let (treemacs-get-local-window)
-        (with-selected-window it
-          (treemacs--follow-after-buffer-list-update)
-          (hl-line-highlight)))))
-
-  (add-hook 'eyebrowse-post-window-switch-hook #'treemacs--follow-after-eyebrowse-switch)
-  ;; https://github.com/Alexander-Miller/treemacs/issues/569#issuecomment-557266369
-  ;; (defun popup-treemacs ()
-  ;;   (save-selected-window
-  ;;     (treemacs-select-window)))
-  ;; (add-hook 'eyebrowse-post-window-switch-hook #'popup-treemacs)
-
   :bind
   (:map global-map
-        ("C-,"   . treemacs-select-window)))
+        ("C-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
 
 (use-package treemacs-evil
-  ;; :after treemacs evil
-  :disabled
+  :after treemacs evil
   :ensure t)
 
 (use-package treemacs-projectile
-  ;; :after treemacs projectile
-  :disabled
+  :after treemacs projectile
   :ensure t)
 
 (use-package treemacs-icons-dired
-  :disabled
-  :after treemacs
+  :after treemacs dired
+  :ensure t
   :config (treemacs-icons-dired-mode))
 
 (use-package treemacs-magit
-  ;; :after treemacs magit
-  :disabled
+  :after treemacs magit
   :ensure t)
 
-(use-package exec-path-from-shell
-  :disabled
-  :init
-  (exec-path-from-shell-copy-env "PYENV_SHELL")
-  (exec-path-from-shell-copy-env "STUDY")
-  :config
-  (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize)))
-
-(use-package which-key
-  :disabled)
-
-(use-package yequake)
-
-(use-package w3m
-  :defer t)
+(use-package treemacs-persp
+  :after treemacs persp-mode
+  :ensure t
+  :config (treemacs-set-scope-type 'Perspectives))
 
 (use-package better-defaults
   :config
   (setq visible-bell nil))
-
-(use-package auto-package-update
-  :disabled
-  :config
-  (setq auto-package-update-interval 30
-        auto-package-update-delete-old-versions t
-        auto-package-update-hide-results nil
-        auto-package-update-prompt-before-update t)
-  (auto-package-update-maybe))
 
 (define-derived-mode scratch-mode
   text-mode "scratch")
@@ -1269,10 +1179,6 @@
   :with 'evil-ex-nohighlight
   [remap my-save-buffer]
   [remap save-buffer])
-
-(use-package restart-emacs
-  :config
-  (setq restart-emacs-restore-frames nil))
 
 (use-package recursive-narrow)
 
@@ -1286,53 +1192,10 @@
   (save-place-mode 1))
 
 (use-package benchmark-init
+  :disabled
   :config
   ;; To disable collection of benchmark data after init is done.
   (add-hook 'after-init-hook 'benchmark-init/deactivate))
-
-(use-package beacon
-  ;; :if window-system
-  :disabled
-  :init (add-hook 'beacon-dont-blink-predicates
-                  (lambda () (bound-and-true-p centered-cursor-mode)))
-  :config
-  (setq beacon-dont-blink-commands '(next-line
-                                     org-edit-special
-                                     org-edit-src-exit
-                                     evil-forward-word-begin
-                                     evil-backward-word-begin
-                                     beginning-of-visual-line
-                                     evil-goto-first-line
-                                     evil-goto-line
-                                     evil-end-of-visual-line
-                                     end-of-visual-line
-                                     evil-indent
-                                     previous-line
-                                     forward-line
-                                     find-packs
-                                     find-keys
-                                     find-misc
-                                     helpful-at-point
-                                     quit-window
-                                     find-functions
-                                     find-macros
-                                     evil-scroll-page-up
-                                     evil-scroll-page-down
-                                     find-hydras
-                                     find-file
-                                     counsel-find-file
-                                     scroll-up-command
-                                     scroll-down-command
-                                     last-buffer))
-  (setq beacon-size 30
-        beacon-blink-delay 0.1
-        beacon-blink-duration 0.06
-        beacon-blink-when-focused nil
-        beacon-blink-when-window-scrolls t
-        beacon-blink-when-window-changes t
-        beacon-blink-when-point-moves-vertically nil
-        beacon-blink-when-point-moves-horizontally nil)
-  (beacon-mode +1))
 
 (use-package unkillable-scratch
   :config
@@ -1364,27 +1227,8 @@
   (setq undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'"))
   (global-undo-fu-session-mode))
 
-(use-package vlf
-  :disabled
-  :ensure t
-  :init
-  (add-hook 'vlf-mode-hook 'my-vlf-hooks)
-  :config
-
-  (setq vlf-save-in-place t)
-
-  (defun my-vlf-hooks ()
-    (interactive)
-    (font-lock-mode -1)
-    (setq-local super-save-mode nil))
-
-  (setq vlf-tune-enabled nil
-        vlf-application 'dont-ask)
-
-  (require 'vlf-setup))
-
 (use-package sudo-edit
-  :defer t
+  :disabled
   :ensure t)
 
 (use-package caps-lock
@@ -1392,8 +1236,7 @@
   :bind (("C-c c" . caps-lock-mode)))
 
 (use-package elmacro
-  ;; :if window-system
-  :defer t
+  :disabled
   :config
   (elmacro-mode +1))
 
@@ -1430,7 +1273,6 @@
 
   (general-nmap
     :keymaps 'helpful-mode-map
-    ;; "<escape>" 'evil-ex-nohighlight
     "<escape>" 'quit-window)
 
   (general-define-key
@@ -1455,44 +1297,6 @@
 ;; (autoload 'turn-on-auto-capitalize-mode "auto-capitalize"
 ;;   "Turn on `auto-capitalize' minor mode in this buffer." t)
 ;; (autoload 'enable-auto-capitalize-mode "auto-capitalize" "Enable `auto-capitalize' minor mode in this buffer." t)
-
-(use-package helm
-  ;; :disabled
-  :init
-  (add-hook 'helm-occur-mode-hook 'previous-history-element)
-  :config
-  (setq helm-split-window-default-side 'same
-        helm-full-frame t)
-  ;; (helm-autoresize-mode +1)
-
-  (general-define-key
-   :keymaps   'helm-map
-   "<insert>" 'yank
-   "C-s"      'previous-history-element
-   "C-w"      'backward-kill-word))
-
-(use-package helm-org
-  ;; :after helm org
-  :disabled
-  :config
-
-  (defun my/helm-org-in-buffer-headings ()
-    (interactive)
-    (widen)
-    (helm-org-in-buffer-headings)
-    (org-narrow-to-subtree)))
-
-(use-package helm-org-rifle
-  ;; :after helm org
-  :disabled)
-
-(use-package helm-swoop
-  :after helm
-  :config
-  (general-define-key
-   :keymaps  'helm-swoop-map
-   "C-c i"     'helm-swoop-yank-thing-at-point
-   "C-w"     'backward-kill-word))
 
 (use-package ivy
   :defer 5
@@ -1620,6 +1424,7 @@
   (general-define-key
    :states '(normal visual)
    :keymaps 'ivy-mode-map
+   "C-t" 'ivy-resume
    "M-u" 'ivy-yasnippet)
 
   (general-nvmap
@@ -1965,15 +1770,16 @@
 ;;   ("a" my-execute-python-program-shell))
 
 (defhydra hydra-projectile-mode (:color blue :hint nil :foreign-keys run)
+
   "
 
   Projectile
-  ^^^^^----------------------------------------------------
-  _a_: ag             _f_: file dwin    _k_: kill buffers
+  ^^^^^^^--------------------------------------------------------------------
+  _a_: ag             _f_: file dwin    _k_: kill buffers    _w_: add project
   _g_: ag at point    _i_: file         _p_: switch project
-  _c_: counsel proj.  _d_: file in dir  _b_: switch buffer
+  _c_: counsel proj.  _d_: file in dir  _b_: switch buffer "
 
-"
+
   ("q" nil)
   ("<escape>" nil)
 
@@ -1988,7 +1794,8 @@
   ("k" projectile-kill-buffers)
   ("p" counsel-projectile-switch-project)
   ("b" counsel-projectile-switch-to-buffer)
-  ("." counsel-org-capture))
+  ("." counsel-org-capture)
+  ("w" projectile-add-known-project))
 
 (defhydra hydra-tangle (:color blue :hint nil :exit nil :foreign-keys nil)
   "
@@ -2860,40 +2667,6 @@ _n_: next sexp
   ("x" cool-moves-sexp-forward)
   ("X" cool-moves-sexp-backward))
 
-(use-package hercules
-  :disabled
-  :config
-
-  (hercules-def
-   :toggle-funs #'org-babel-mode
-   :keymap 'org-babel-map
-   :transient t)
-
-  (general-define-key
-   :keymaps 'org-mode-map
-   :states '(normal visual insert)
-   "C-x C-v" #'org-babel-mode)
-
-  (hercules-def
-   :toggle-funs #'racket
-   :keymap 'racket-mode-map
-   :transient t)
-
-  (general-define-key
-   :keymaps 'racket-mode-map
-   :states '(normal visual insert)
-   "C-ç" #'racket)
-
-  (hercules-def
-   :toggle-funs #'lispyville
-   :keymap 'lispyville-mode-map
-   :transient t)
-
-  (general-define-key
-   :keymaps 'lispyville-mode-map
-   :states '(normal visual insert)
-   "C--" #'lispyville))
-
 (use-package buffer-move
 :defer nil
 :ensure t)
@@ -3118,10 +2891,9 @@ with the scratch buffer."
                                          "*org-src-fontification\\.\\*")))
 
 (use-package centered-cursor-mode
-:defer t
-:ensure t
-:config
-(setq ccm-recenter-at-end-of-file t))
+  :disabled
+  :config
+  (setq ccm-recenter-at-end-of-file t))
 
 (use-package dired
   :ensure nil
@@ -3130,13 +2902,15 @@ with the scratch buffer."
         delete-by-moving-to-trash t
         dired-listing-switches "-lsh"
         dired-hide-details-mode t)
-
   (defun my-dired-do-find-marked-files ()
     (interactive)
     (dired-do-find-marked-files)
-    (delete-other-windows)))
+    (delete-other-windows))
+
+(global-dired-hide-details-mode t))
 
 (use-package dired+
+  :disabled
   :quelpa (dired+ :fetcher url :url "https://www.emacswiki.org/emacs/download/dired+.el")
   :after dired
   :config
@@ -3146,8 +2920,8 @@ with the scratch buffer."
 
 (use-package ranger
   :init
-  ;; (add-hook 'ranger-mode-hook 'my-ranger-options)
-  ;; (add-hook 'ranger-parent-dir-hook 'my-ranger-options-parent)
+  (add-hook 'ranger-mode-hook 'my-ranger-options)
+  (add-hook 'ranger-parent-dir-hook 'my-ranger-options-parent)
 
   (defun my-ranger-deer ()
     (interactive)
@@ -3158,9 +2932,6 @@ with the scratch buffer."
 
   :bind (:map ranger-mode-map
               ("i"          . ranger-go)
-              (";"          . evil-ex)
-              ;; ("SPC"        . my-ranger-toggle-mark)
-              ("m"          . my-ranger-toggle-mark)
               ("tp"         . delete-file)
               ("<escape>"   . ranger-close)
               ("r"          . ranger-close)
@@ -3303,15 +3074,11 @@ with the scratch buffer."
 
   (defun my-ranger-options ()
     (interactive)
-    (line-no-numbers)
     (olivetti-mode +1)
-    (dired-hide-details-mode +1)
     (hide-mode-line-mode +1))
 
   (defun my-ranger-options-parent ()
     (interactive)
-    (line-no-numbers)
-    (dired-hide-details-mode +1)
     (toggle-truncate-lines +1)
     (hide-mode-line-mode +1))
 
@@ -3330,11 +3097,6 @@ with the scratch buffer."
     (interactive)
     (my-copy-dir)
     (start-process-shell-command "my-show-ranger" nil "~/scripts/emacs_scripts/show-ranger")))
-
-(use-package which-key
-  :disabled
-  :config
-  (setq which-key-idle-delay 0.5))
 
 (use-package super-save
   :config
@@ -3373,12 +3135,8 @@ with the scratch buffer."
 
   (setq wordnut-cmd "/usr/local/bin/wn"))
 
-(use-package aggressive-fill-paragraph
-  :defer t)
-
 (use-package pabbrev
-  :defer t
-  :ensure t
+  :disabled
   :config
   (setq pabbrev-idle-timer-verbose nil)
   (general-imap
@@ -3387,7 +3145,6 @@ with the scratch buffer."
 
 (use-package lorem-ipsum
   :defer t
-  :ensure t
   :config
   (setq lorem-ipsum-paragraph-separator "\n\n"))
 
@@ -3552,46 +3309,8 @@ with the scratch buffer."
   ;; :if window-system
   :defer t)
 
-(use-package typo
-  :defer t
-  :config
-  (defun typo-insert-cycle (cycle)
-    "Insert the strings in CYCLE"
-    (let ((i 0)
-          (repeat-key last-input-event)
-          repeat-key-str)
-      (insert (nth i cycle))
-      (setq repeat-key-str (format-kbd-macro (vector repeat-key) nil))
-      (while repeat-key
-        (message "(inserted %s)"
-                 (typo-char-name (nth i cycle))
-                 repeat-key-str)
-        (if (equal repeat-key (read-event))
-            (progn
-              (clear-this-command-keys t)
-              (delete-char (- (length (nth i cycle))))
-              (setq i (% (+ i 1)
-                         (length cycle)))
-              (insert (nth i cycle))
-              (setq last-input-event nil))
-          (setq repeat-key nil)))
-      (when last-input-event
-        (clear-this-command-keys t)
-        (setq unread-command-events (list last-input-event)))))
-
-
-  (define-typo-cycle typo-cycle-dashes
-    "Cycle through various dashes."
-    ("—"   ; EM DASHH
-     "-"   ; HYPHEN-MINUS
-     "–"   ; EN DASH
-     "−"   ; MINUS SIGN
-     "‐"   ; HYPHEN
-     "‑")) ; NON-BREAKING HYPHEN
-  (setq typo-language "brasileiro"))
-
 (use-package fountain-mode
-  :defer t
+  :disabled
   :init
   (add-hook 'fountain-mode-hook 'my-fountain-hooks)
   :ensure t
@@ -3644,13 +3363,11 @@ with the scratch buffer."
   )
 
 (use-package url-shortener
-  ;; :if window-system
   :defer t
   :config
   (setq bitly-access-token "3026d7e8b1a0f89da10740c69fd77b4b3293151e"))
 
 (use-package pdf-tools
-  ;; :defer t
   :init
 
   (add-hook 'pdf-view-mode-hook 'my-pdf-view-settings)
@@ -3819,104 +3536,6 @@ with the scratch buffer."
     "C-c h" 'pdf-annot-add-highlight-markup-annotation)
 
   (pdf-loader-install))
-
-(defun my-write-insert-mode ()
-  (interactive)
-  (general-unbind '(org-mode-map evil-org-mode-map)
-    :with 'ignore
-    ;; [remap evil-delete-backward-word]
-    [remap undo-fu-only-redo]
-    [remap undo-fu-only-undo]
-    [remap evil-org-open-below]
-    [remap evil-org-open-above]
-    [remap delete-backward-char]
-    [remap delete-char]
-    [remap evil-change-line]
-    [remap evil-change-to-initial-state]
-    [remap evil-change-to-previous-state]
-    [remap evil-change-whole-line]
-    [remap evil-change]
-    [remap evil-delete-backward-char-and-join]
-    [remap evil-delete-backward-char]
-    [remap evil-delete-buffer]
-    [remap evil-delete-char]
-    [remap evil-delete-line]
-    [remap evil-delete-marks]
-    [remap evil-delete-whole-line]
-    [remap evil-delete]
-    [remap evil-join-space]
-    [remap evil-join]
-    [remap evil-org-delete-backward-char]
-    [remap evil-org-delete-char]
-    [remap evil-org-delete]
-    [remap kill-line]
-    [remap kill-paragraph]
-    [remap kill-rectangle]
-    [remap kill-region]
-    [remap kill-ring-save]
-    [remap kill-sentence]
-    [remap kill-visual-line]
-    [remap kill-whole-line]
-    [remap kill-word]
-    [remap my/backward-kill-line]
-    [remap org-delete-backward-char]
-    [remap org-delete-char]
-    [remap org-delete-indentation]
-    [remap org-delete-property-globally]
-    [remap org-delete-property]
-    [remap undo])
-  (evil-define-key 'insert org-mode-map (kbd "C-k") 'ignore)
-  (evil-define-key 'insert org-mode-map (kbd "DEL") 'ignore)
-  (message " insert only"))
-
-(defun my-write-edit-mode ()
-  (interactive)
-  (general-unbind '(org-mode-map evil-org-mode-map)
-    :with nil
-    [remap undo-fu-only-redo]
-    [remap undo-fu-only-undo]
-    [remap evil-delete-backward-word]
-    [remap evil-org-open-below]
-    [remap evil-org-open-above]
-    [remap delete-backward-char]
-    [remap delete-char]
-    [remap evil-change-line]
-    [remap evil-change-to-initial-state]
-    [remap evil-change-to-previous-state]
-    [remap evil-change-whole-line]
-    [remap evil-change]
-    [remap evil-delete-backward-char-and-join]
-    [remap evil-delete-backward-char]
-    [remap evil-delete-buffer]
-    [remap evil-delete-char]
-    [remap evil-delete-line]
-    [remap evil-delete-marks]
-    [remap evil-delete-whole-line]
-    [remap evil-delete]
-    [remap evil-join-space]
-    [remap evil-join]
-    [remap evil-org-delete-backward-char]
-    [remap evil-org-delete-char]
-    [remap evil-org-delete]
-    [remap kill-line]
-    [remap kill-paragraph]
-    [remap kill-rectangle]
-    [remap kill-region]
-    [remap kill-ring-save]
-    [remap kill-sentence]
-    [remap kill-visual-line]
-    [remap kill-whole-line]
-    [remap kill-word]
-    [remap my/backward-kill-line]
-    [remap org-delete-backward-char]
-    [remap org-delete-char]
-    [remap org-delete-indentation]
-    [remap org-delete-property-globally]
-    [remap org-delete-property]
-    [remap undo])
-  (evil-define-key 'insert org-mode-map (kbd "C-k") 'kill-visual-line)
-  (evil-define-key 'insert org-mode-map (kbd "DEL") 'evil-delete-backward-char-and-join)
-  (message " insert and edit"))
 
 (use-package json-mode
   :defer t
@@ -4435,8 +4054,7 @@ with the scratch buffer."
     "M-;" 'hydra-yasnippet/body
     "DEL" 'evil-delete-backward-char-and-join)
 
-  (yas-global-mode +1)
-  )
+  (yas-global-mode +1))
 
 (use-package yasnippet-snippets
   :after yasnippet)
@@ -4485,11 +4103,6 @@ with the scratch buffer."
    "C-:"     'helpful-variable
    "C-;" 'helpful-at-point
    )
-
-  (general-define-key
-   :keymaps 'lispy-mode-map
-   :states '(normal visual)
-   ";" 'evil-ex)
 
   (general-define-key
    :keymaps 'lispy-mode-map
@@ -4746,6 +4359,8 @@ with the scratch buffer."
   :ensure t
   ;; :init
   ;; (add-hook 'flycheck-mode-hook 'my-disable-python-mypy)
+  :init
+  (add-to-list 'flycheck-disabled-checkers 'python-mypy)
   :config
 
   (defun my-disable-python-mypy ()
@@ -5090,7 +4705,7 @@ with the scratch buffer."
   (add-hook 'inferior-python-mode-hook 'my-inferior-python-mode-hooks)
 
   :bind (:map python-mode-map
-              ("<M-return>" . 'blacken-buffer)
+              ("<M-return>" . 'apheleia-format-buffer)
               ("M-a"        . 'python-nav-backward-statement)
               ("M-e"        . 'python-nav-forward-statement)
               ("C-S-p"      . 'python-nav-backward-sexp)
@@ -5224,7 +4839,6 @@ with the scratch buffer."
     "C-S-n" 'python-nav-forward-sexp))
 
 (use-package elpy
-  :defer t
   :custom
   (elpy-autodoc-delay 3)
   (elpy-rpc-virtualenv-path 'current)
@@ -5263,22 +4877,19 @@ with the scratch buffer."
   (blacken-fast-unsafe nil)
   (blacken-line-length 79))
 
+(straight-use-package '(apheleia :host github :repo "raxod502/apheleia"))
+;; (setf (alist-get 'black apheleia-formatters) '("black" "-l" "79" "-"))
+(setq apheleia-formatters '((black "black" "-l" "79" "-")
+                            (brittany "brittany" file)
+                            (prettier npx "prettier" file)
+                            (gofmt "gofmt")
+                            (terraform "terraform" "fmt" "-")))
+(apheleia-global-mode +1)
+
 (use-package yafolding
   :defer t)
 
-(use-package origami
-  :disabled)
-
-(use-package clipmon
-  :defer nil
-  :config
-  ;; https://github.com/bburns/clipmon/issues/11
-  (setq clipmon-transform-trim nil)
-  (setq selection-coding-system 'utf-8-unix)
-  (clipmon-mode +1))
-
 (use-package delight
-  ;; :if window-system
   :after doom-modeline
   :config
   (delight '((projectile-mode nil)
@@ -5306,13 +4917,6 @@ with the scratch buffer."
              (abbrev-mode "" "Abbrev")
              (evil-org-mode "" " EvilOrg")
              (elmacro-mode " " "elmacro"))))
-
-(use-package dimmer
-  :disabled
-  :config
-  (setq dimmer-buffer-exclusion-regexps '("*LV*" "^ \\*Minibuf-[0-9]+\\*$" "^ \\*Echo.*\\*$")
-        dimmer-fraction 0.2)
-  (dimmer-mode +1))
 
 (use-package doom-modeline
   :after doom-themes
@@ -5400,30 +5004,10 @@ with the scratch buffer."
 :defer t
 :ensure t)
 
-(use-package telephone-line
-  :disabled
-  :config
-  (telephone-line-mode +1))
-
-(use-package smart-mode-line
-  :disabled
-  :config
-  (setq sml/no-confirm-load-theme t)
-  (sml/setup))
-
 (use-package doom-themes
-  ;; :disabled
   :config
   (doom-themes-org-config)
-  (load-theme 'doom-dracula t)
-  ;; (load-theme 'doom-gruvbox t)
-  )
-
-(use-package dracula-theme
-  :disabled
-  :config
-  (setq dracula-enlarge-headings nil)
-  (load-theme 'dracula t))
+  (load-theme 'doom-dracula t))
 
 (defun text-scale-reset ()
   (interactive)
@@ -5570,8 +5154,6 @@ with the scratch buffer."
   :defer t
   :custom
   (zoom-size '(0.618 . 0.618)))
-
-;; (run-with-timer 0 (* 2 60) 'redraw-display)
 
 (use-package server
   :ensure nil
@@ -5757,7 +5339,7 @@ with the scratch buffer."
   :defer t
   :ensure nil
   :config
-  (setq eldoc-idle-delay 0.5)
+  (setq eldoc-idle-delay 1)
   (global-eldoc-mode -1))
 
 (use-package text-mode
@@ -6440,11 +6022,6 @@ with the scratch buffer."
     "C-h" 'term-send-backspace
     "C-/" 'my-term-delete-window
     "M-r" nil))
-
-(use-package sane-term
-  :ensure t
-  :bind (("C-x t" . sane-term)
-    ("C-x T" . sane-term-create)))
 
 (use-package abbrev
   :defer t
