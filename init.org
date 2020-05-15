@@ -894,7 +894,7 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
 
   (leader
     :states  '(normal visual)
-    :keymaps 'override
+    :keymaps '(override messages-buffer-mode-map)
     ";"      'my-eval-buffer
     "u"      'hydra-projectile-mode/body
     "p"      'hydra-packages/body
@@ -902,7 +902,7 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
     "e"      'visible-mode
     ","      'olivetti-mode
     "\\"     'org-babel-tangle
-    "/"     'org-babel-tangle
+    "/"      'org-babel-tangle
     "."      'my-tangle-py-init.org-only
     "-"      'my-tangle-py-init.org-only-and-quit-window
     "d"      'my-dup-line
@@ -927,8 +927,6 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
     "T"      'my-reopen-killed-file-fancy
     "l"      'hydra-tangle/body
     "w"      'widenToCenter
-    "W"      'widenToCenter
-    ;; "n"      'recursive-narrow-or-widen-dwim
     "n"      'org-narrow-to-subtree)
 
   (general-unbind 'global
@@ -1483,8 +1481,24 @@ Source: https://bit.ly/3ajarHi and https://gitlab.com/koral/gcmh/
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "C-0") #'treemacs-select-window))
+  :bind (:map treemacs-mode-map
+              ("<insert>"   . treemacs-create-file)
+              ("ad"         . treemacs-remove-project-from-workspace)
+              ("ap"         . treemacs-add-project-to-workspace)
+              ("aP"         . treemacs-projectile)
+              ("D"          . treemacs-delete)
+              ("m"          . treemacs-RET-action)
+              ("C-0"          . treemacs-quit)
+
+              )
 
   :config
+
+  (general-define-key
+   :keymaps 'treemacs-mode-map
+
+   )
+
   (progn
     (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
           treemacs-deferred-git-apply-delay      0.5
@@ -5042,12 +5056,8 @@ If you run ~racket-mode-start-faster~ this command, ever, you should run it agai
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
-  :ensure t
-  ;; :init
-  ;; (add-hook 'flycheck-mode-hook 'my-disable-python-mypy)
-  :init
-  (add-to-list 'flycheck-disabled-checkers 'python-mypy)
   :config
+  (add-to-list 'flycheck-disabled-checkers 'python-mypy)
 
   (defun my-disable-python-mypy ()
     (interactive)

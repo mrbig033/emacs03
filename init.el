@@ -129,12 +129,15 @@
 
 (use-package evil
   :init
-  (setq evil-respect-visual-line-mode nil
+  (setq 
+    evil-respect-visual-line-mode nil
         evil-want-integration t
         evil-want-keybinding nil
         evil-jumps-cross-buffers t
         evil-ex-substitute-global t
-        evil-want-Y-yank-to-eol t)
+        evil-want-Y-yank-to-eol t
+
+        )
 
   ;;;; EVIL ORG MODE ;;;
   (add-hook 'org-mode-hook 'evil-org-mode)
@@ -1053,7 +1056,7 @@
            :tags-as-categories nil))))
 
 (use-package org-pdftools
-  :after org)
+  :disabled)
 
 (use-package org-pomodoro
   :after org
@@ -2907,7 +2910,8 @@ with the scratch buffer."
     (dired-do-find-marked-files)
     (delete-other-windows))
 
-(global-dired-hide-details-mode t))
+; (global-dired-hide-details-mode t)
+)
 
 (use-package dired+
   :disabled
@@ -2936,21 +2940,21 @@ with the scratch buffer."
               ("<escape>"   . ranger-close)
               ("r"          . ranger-close)
               ("gg"         . ranger-goto-top)
-              ("C-h"        . hydra-help/body)
-              ("C-n"        . ranger-next-file)
-              ("C-p"        . ranger-prev-file)
-              ("C-l"        . ranger-find-links-dir)
+              ("c-h"        . hydra-help/body)
+              ("c-n"        . ranger-next-file)
+              ("c-p"        . ranger-prev-file)
+              ("c-l"        . ranger-find-links-dir)
               ("zi"         . ranger-toggle-details)
               ("zp"         . ranger-preview-toggle)
               ("çcm"        . dired-create-directory)
               ("<insert>"   . counsel-find-file)
-              ("C-c n"      . counsel-find-file)
-              ("D"          . dired-do-flagged-delete)
+              ("c-c n"      . counsel-find-file)
+              ("d"          . dired-do-flagged-delete)
               ("x"          . diredp-delete-this-file)
               ("d"          . dired-flag-file-deletion)
-              ("<C-return>" . dired-do-find-marked-files)
-              ;; ("<S-return>" . ranger-find-file-in-workspace)
-              ("<S-return>" . my-dired-do-find-marked-files))
+              ("<c-return>" . dired-do-find-marked-files)
+              ;; ("<s-return>" . ranger-find-file-in-workspace)
+              ("<s-return>" . my-dired-do-find-marked-files))
   :config
 
   (general-create-definer leader
@@ -3045,7 +3049,7 @@ with the scratch buffer."
               ('n "~/Downloads")
               ('r "~/creative")
               ('f "~/.config")
-              ('p "~/Documents/Study/python")
+              ('p "~/documents/study/python")
 
               ('q nil)))
            (alt-option
@@ -4356,12 +4360,8 @@ with the scratch buffer."
     "C-w"))
 
 (use-package flycheck
-  :ensure t
-  ;; :init
-  ;; (add-hook 'flycheck-mode-hook 'my-disable-python-mypy)
-  :init
-  (add-to-list 'flycheck-disabled-checkers 'python-mypy)
   :config
+  (add-to-list 'flycheck-disabled-checkers 'python-mypy)
 
   (defun my-disable-python-mypy ()
     (interactive)
